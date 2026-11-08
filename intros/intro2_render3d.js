@@ -26,15 +26,28 @@ const server = http.createServer((req, res) => {
   fs.createReadStream(p).pipe(res);
 });
 
-server.listen(0, '127.0.0.1', async () => {
-  const port = server.address().port;
+// The browser is restarted every CHUNK frames: Playwright keeps a copy of every uploaded frame it sees,
+// so one long-lived page would slowly run out of memory. The scene is a pure function of t, so chunks are seamless.
+const CHUNK = 40;
+async function openPage(port) {
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const page = await browser.newPage({ viewport: { width: 3840, height: 2160 }, deviceScaleFactor: 1 });
   page.on('console', m => process.stderr.write('[page] ' + m.text() + '\n'));
   page.on('pageerror', e => process.stderr.write('[page error] ' + e.message + '\n'));
   await page.goto(`http://127.0.0.1:${port}/intro2_scene.html`);
   await page.waitForFunction(() => window.READY === true, null, { timeout: 300000 });
+  return { browser, page };
+}
+
+server.listen(0, '127.0.0.1', async () => {
+  const port = server.address().port;
+  let browser = null, page = null, done = 0;
   for (const f of FRAMES) {
+    if (done % CHUNK === 0) {
+      if (browser) await browser.close();
+      ({ browser, page } = await openPage(port));
+    }
+    done++;
     const got = new Promise(r => { deliver = r; });
     const t0 = Date.now();
     const info = await page.evaluate(async f => await window.renderFrame(f), f);
