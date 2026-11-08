@@ -10,4 +10,4 @@ leaning bar) are windows that move into place, and the finished logo is the flag
 - `audio.js`: soundtrack built with OfflineAudioContext, exported to WAV.
 - `scripts/beat_frames.js`: one frame per beat for review. `scripts/render.js`: 60 fps × 3 subframes → ffmpeg tmix → mux.
 
-Rebuild: `python3 -c "..."` (inject geometry, see commit history) then `node scripts/render.js`.
+Rebuild: `python3 scripts/build_html.py Rebuild: `python3 -c "..."` (inject geometry, see commit history) then `node scripts/render.js`.Rebuild: `python3 -c "..."` (inject geometry, see commit history) then `node scripts/render.js`. node scripts/render.js`
