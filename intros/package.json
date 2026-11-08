@@ -1,0 +1,8 @@
+{
+  "name": "astris-intros",
+  "private": true,
+  "description": "Render helpers for the ASTRIS PRODUCTIONS intros (three.js scene for intro 2)",
+  "dependencies": {
+    "three": "^0.170.0"
+  }
+}

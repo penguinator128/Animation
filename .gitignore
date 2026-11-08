@@ -1,2 +1,7 @@
 out/
 node_modules/
+intros/output/
+intros/test-frames/
+intros/logs/
+intros/node_modules/
+__pycache__/

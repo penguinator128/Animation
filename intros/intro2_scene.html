@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ASTRIS 3D Scene</title>
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{"imports": {"three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/"}}
+</script>
+</head>
+<body>
+<script type="module">
+// ASTRIS PRODUCTIONS - intro 2 3D layer. Everything is a pure function of t (renderFrame(f) -> t = f / 24).
+// The traced logo comes in as exact polygons (intro2_geometry.json) and is extruded with a bevel.
+import * as THREE from 'three';
+
+const W = 3840, H = 2160, FPS = 24;
+const T_FUSE = 5.75, T_PULL0 = 5.55, T_PULL1 = 8.6;
+const GEO = await (await fetch('/intro2_geometry.json')).json();
+
+// ---------- helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const smooth = x => { x = clamp(x); return x * x * x * (x * (x * 6 - 15) + 10); };
+const expoInOut = x => { x = clamp(x); const k = 7, f = v => (Math.exp(k * v) - 1) / (Math.exp(k) - 1);
+  return x < 0.5 ? f(2 * x) / 2 : 1 - f(2 - 2 * x) / 2; };
+const expoOut = (x, k = 6) => { x = clamp(x); return (1 - Math.exp(-k * x)) / (1 - Math.exp(-k)); };
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const rand = mulberry32(20261108);
+
+// ---------- renderer ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, premultipliedAlpha: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+renderer.setClearColor(0x000000, 0);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+
+// ---------- studio environment: gradient dome + softboxes + a purple backlight ----------
+function makeEnv() {
+  const env = new THREE.Scene();
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(20, 64, 32), new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: `varying vec3 vP; void main(){
+      float y = vP.y;
+      vec3 top = vec3(0.42, 0.34, 0.78), mid = vec3(0.10, 0.05, 0.20), bot = vec3(0.02, 0.01, 0.05);
+      vec3 c = mix(mid, top, smoothstep(0.0, 0.95, y));
+      c = mix(c, bot, smoothstep(0.0, -0.7, y));
+      c += vec3(0.35, 0.12, 0.55) * pow(max(0.0, -vP.z), 3.0) * 0.6;   // violet glow behind the logo
+      gl_FragColor = vec4(c, 1.0); }`
+  }));
+  env.add(dome);
+  const panel = (w, h, pos, col, k) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k), side: THREE.DoubleSide }));
+    m.position.copy(pos); m.lookAt(0, 0, 0); env.add(m);
+  };
+  panel(9, 3.2, new THREE.Vector3(0, 7, 6), 0xffffff, 4.0);       // big top-front softbox
+  panel(5, 5, new THREE.Vector3(-1.5, 1.5, 12), 0xfff6ff, 1.6);   // behind the camera: lights the front faces
+  panel(2.2, 9, new THREE.Vector3(-9, 0.5, 2), 0xffd6f2, 3.0);    // left strip (warm pink)
+  panel(2.2, 9, new THREE.Vector3(9, 0.5, 2), 0xcfe0ff, 3.0);     // right strip (cool)
+  panel(10, 2.5, new THREE.Vector3(0, 1.0, -10), 0xa060ff, 5.0);  // purple backlight
+  // a ring of thin white strip lights: crisp highlights that sweep across turning surfaces,
+  // which is what lets the thin-film (iridescent) colours show up as moving rainbow bands
+  for (let k = 0; k < 10; k++) {
+    const a = k / 10 * Math.PI * 2, y = (k % 2 ? 2.5 : -1.5);
+    panel(0.6, 7, new THREE.Vector3(Math.cos(a) * 11, y, Math.sin(a) * 11), 0xffffff, 6.0);
+  }
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  return pmrem.fromScene(env, 0.015).texture;
+}
+scene.environment = makeEnv();
+
+// ---------- materials ----------
+const shardMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff, metalness: 0.92, roughness: 0.10, clearcoat: 1.0, clearcoatRoughness: 0.03,
+  iridescence: 1.0, iridescenceIOR: 1.9, iridescenceThicknessRange: [220, 1050], envMapIntensity: 1.5,
+});
+const logoMat = shardMat.clone();
+const ringMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff, metalness: 1.0, roughness: 0.10, clearcoat: 1.0, iridescence: 0.85, iridescenceIOR: 1.6,
+  iridescenceThicknessRange: [220, 900], envMapIntensity: 1.4,
+});
+const pearlMat = new THREE.MeshPhysicalMaterial({
+  color: 0xffffff, metalness: 0.15, roughness: 0.12, clearcoat: 1.0, iridescence: 1.0, iridescenceIOR: 1.45,
+  iridescenceThicknessRange: [300, 950], sheen: 1.0, sheenColor: new THREE.Color(0xd8b8ff), envMapIntensity: 1.3,
+});
+
+// ---------- thin-film shimmer: oil-slick rainbow bands that travel across every glossy surface ----------
+const SHIM = { uTime: { value: 0 }, uShimmer: { value: 1 } };
+function addShimmer(mat, gain = 1.0) {
+  mat.onBeforeCompile = (sh) => {
+    sh.uniforms.uTime = SHIM.uTime; sh.uniforms.uShimmer = SHIM.uShimmer;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vWPos;')
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvWPos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+        uniform float uTime; uniform float uShimmer; varying vec3 vWPos;
+        vec3 film(float h) { return clamp(abs(fract(h + vec3(0.0, 2.0 / 3.0, 1.0 / 3.0)) * 6.0 - 3.0) - 1.0, 0.0, 1.0); }`)
+      .replace('#include <dithering_fragment>', `{
+        vec3 Vw = normalize(cameraPosition - vWPos);
+        vec3 Nw = normalize(inverseTransformDirection(normal, viewMatrix));
+        float ndv = abs(dot(Nw, Vw));
+        float h = ndv * 1.7 + vWPos.x * 0.55 + vWPos.y * 0.38 + vWPos.z * 0.3 - uTime * 0.32;
+        float fres = pow(1.0 - ndv, 1.4);
+        float band = 0.5 + 0.5 * sin(vWPos.x * 3.1 - vWPos.y * 2.3 + vWPos.z * 1.7 + uTime * 1.6);
+        vec3 rb = film(h);
+        float k = uShimmer * ${gain.toFixed(2)} * (0.30 + 0.70 * band) * (0.45 + 0.55 * fres);
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (0.30 + 0.95 * rb) + rb * 0.22 * fres, clamp(k, 0.0, 1.0));
+      }
+      #include <dithering_fragment>`);
+  };
+  mat.customProgramCacheKey = () => 'shimmer' + gain;
+}
+addShimmer(shardMat, 1.0);
+addShimmer(logoMat, 1.0);
+addShimmer(ringMat, 0.8);
+addShimmer(pearlMat, 0.7);
+
+// ---------- logo geometry (exact polygons from the traced logo) ----------
+const DEPTH = 0.14;
+const toShape = o => {
+  const s = new THREE.Shape(o.outer.map(p => new THREE.Vector2(p[0], p[1])));
+  for (const h of o.holes) s.holes.push(new THREE.Path(h.map(p => new THREE.Vector2(p[0], p[1]))));
+  return s;
+};
+function extrude(shape, bevel) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: DEPTH, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel,
+    bevelOffset: -bevel, bevelSegments: 5, curveSegments: 1, steps: 1 });
+  g.translate(0, 0, -(DEPTH + bevel));       // front face sits exactly on z = 0
+  g.computeVertexNormals();
+  return g;
+}
+const logo = new THREE.Group();
+for (const p of GEO.pieces) logo.add(new THREE.Mesh(extrude(toShape(p), 0.011), logoMat));
+scene.add(logo);
+
+// shards: each pivots around its own centroid; home = its place in the logo
+const shards = GEO.shards.map((s, i) => {
+  const g = extrude(toShape(s), 0.006);
+  g.translate(-s.c[0], -s.c[1], 0);
+  const m = new THREE.Mesh(g, shardMat);
+  const dist = Math.hypot(s.c[0], s.c[1]);
+  const axis = new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize();
+  return { mesh: m, c: s.c, dist, R: 0.75 + rand() * 1.5, a0: rand() * Math.PI * 2, w: (0.18 + rand() * 0.22) * (rand() < 0.5 ? -1 : 1),
+           tilt: new THREE.Quaternion().setFromEuler(new THREE.Euler((rand() - 0.5) * 1.6, rand() * Math.PI * 2, (rand() - 0.5) * 0.8)),
+           axis, spin: 0.6 + rand() * 1.4, spin0: rand() * 6.28, lift: (rand() - 0.5) * 0.5, jitter: rand() };
+});
+// assemble from the centre outward (with a little randomness)
+const order = shards.map((s, i) => [s.dist + s.jitter * 0.12, i]).sort((a, b) => a[0] - b[0]);
+order.forEach(([_, i], k) => { shards[i].arrive = 1.75 + 3.75 * Math.pow(k / (order.length - 1), 0.85); });
+const shardGroup = new THREE.Group();
+shards.forEach(s => shardGroup.add(s.mesh));
+scene.add(shardGroup);
+const FLY = 1.15;
+
+// rings: gyroscope chaos first, then a Saturn-like halo with pearls running along them
+const rings = [[1.22, 0.010, 1.33, 0.10, 0.0], [1.44, 0.0065, 1.27, -0.07, 0.5], [0.98, 0.012, 1.40, 0.16, 1.1]].map(([R, r, fx, fz, ph], k) => {
+  const m = new THREE.Mesh(new THREE.TorusGeometry(R, r, 32, 400), ringMat);
+  const pearls = [0, 1, 2].map(j => { const p = new THREE.Mesh(new THREE.SphereGeometry(0.022 + 0.008 * j, 32, 16), pearlMat); m.add(p); return p; });
+  scene.add(m);
+  return { m, R, pearls, final: new THREE.Quaternion().setFromEuler(new THREE.Euler(fx, 0, fz)), ph,
+           w: [0.7 + rand(), -0.5 - rand(), 0.4 + rand()] };
+});
+
+// glossy decor: pearls and gem-like polyhedra orbiting inside the swarm
+const decorGeos = [new THREE.SphereGeometry(1, 40, 20), new THREE.OctahedronGeometry(1, 0), new THREE.IcosahedronGeometry(1, 0)];
+const decor = Array.from({ length: 34 }, (_, i) => {
+  const kind = i % 3;
+  const m = new THREE.Mesh(decorGeos[kind], kind === 0 ? pearlMat : shardMat);
+  const s = { m, size: 0.018 + rand() * 0.05, R: 0.55 + rand() * 1.7, a0: rand() * 6.28, w: (0.15 + rand() * 0.3) * (rand() < 0.5 ? -1 : 1),
+              tilt: new THREE.Quaternion().setFromEuler(new THREE.Euler((rand() - 0.5) * 1.8, rand() * 6.28, 0)),
+              axis: new THREE.Vector3(rand() - 0.5, rand() - 0.5, rand() - 0.5).normalize(), spin: 1 + rand() * 2 };
+  scene.add(m);
+  return s;
+});
+
+// ---------- lights ----------
+const amb = new THREE.AmbientLight(0x9080b0, 0.35);
+const key = new THREE.DirectionalLight(0xffffff, 2.4); key.position.set(-2.5, 3.5, 4.0);
+const fill = new THREE.DirectionalLight(0xa898ff, 0.7); fill.position.set(3, -1.5, 3);
+const rimA = new THREE.PointLight(0xb070ff, 0, 0, 2); rimA.position.set(0.0, 0.35, -1.1);
+const rimB = new THREE.PointLight(0xff70d8, 0, 0, 2); rimB.position.set(1.3, -0.9, -0.8);
+const rimC = new THREE.PointLight(0x7a70ff, 0, 0, 2); rimC.position.set(-1.3, -0.6, -0.8);
+scene.add(amb, key, fill, rimA, rimB, rimC);
+
+// ---------- camera: inside the swarm, then a long dolly-out to the calibrated lockup framing ----------
+const camera = new THREE.PerspectiveCamera(55, W / H, 0.02, 100);
+const FINAL = { pos: new THREE.Vector3(0, -0.306, 5.04), target: new THREE.Vector3(0, -0.306, 0), fov: 30 };   // logo = 800 px tall at y = 835
+function cameraAt(t) {
+  const ka = clamp(t / T_PULL0);
+  const az = lerp(-0.62, 0.18, smooth(ka)), el = lerp(0.30, 0.06, smooth(ka)), dist = lerp(1.0, 1.75, smooth(ka));
+  const target = new THREE.Vector3(lerp(0.18, 0.02, ka), lerp(0.12, -0.04, ka), -0.06);
+  const posA = target.clone().add(new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el)).multiplyScalar(dist));
+  const fovA = lerp(58, 46, ka), rollA = 0.07 * Math.sin(t * 0.7) * (1 - ka);
+  const kb = expoInOut((t - T_PULL0) / (T_PULL1 - T_PULL0));
+  const pos = posA.lerp(FINAL.pos, kb), tgt = target.lerp(FINAL.target, kb);
+  camera.position.copy(pos);
+  camera.up.set(Math.sin(rollA * (1 - kb)), Math.cos(rollA * (1 - kb)), 0);
+  camera.lookAt(tgt);
+  camera.fov = lerp(fovA, FINAL.fov, kb);
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld(true);
+  return kb;
+}
+
+// ---------- the timeline ----------
+const qI = new THREE.Quaternion();
+function update(t) {
+  const kb = cameraAt(t);
+  const fused = t >= T_FUSE;
+  logo.visible = fused;
+  shardGroup.visible = !fused;
+  // iridescent shimmer: strong while it assembles, an accent once it's whole
+  const irid = lerp(1.0, 0.28, smooth((t - T_FUSE + 0.2) / 2.2));
+  SHIM.uTime.value = t;
+  SHIM.uShimmer.value = lerp(0.85, 0.16, smooth((t - T_FUSE + 0.1) / 2.6));
+  const th0 = 220 + 160 * Math.sin(t * 2.1), th1 = 1050 + 250 * Math.sin(t * 1.3 + 1.0);   // the shimmer travels
+  for (const mat of [shardMat, logoMat]) {
+    mat.iridescence = irid; mat.iridescenceThicknessRange = [th0, th1];
+    mat.metalness = lerp(0.92, 0.45, smooth((t - T_FUSE) / 2.5));
+    mat.roughness = lerp(0.10, 0.18, smooth((t - T_FUSE) / 2.5));
+  }
+  ringMat.iridescence = lerp(0.85, 0.5, smooth((t - T_FUSE) / 2.5));
+  // shards
+  for (const s of shards) {
+    const ang = s.a0 + s.w * t * Math.PI * 2 * 0.25;
+    const orbit = new THREE.Vector3(Math.cos(ang) * s.R, s.lift, Math.sin(ang) * s.R).applyQuaternion(s.tilt);
+    const k = clamp((t - (s.arrive - FLY)) / FLY);
+    const e = smooth(k);
+    const home = new THREE.Vector3(s.c[0], s.c[1], 0);
+    const arc = new THREE.Vector3(-orbit.z, 0.3, orbit.x).normalize().multiplyScalar(Math.sin(Math.PI * e) * 0.35);
+    s.mesh.position.copy(orbit.lerp(home, e).add(arc));
+    const spinQ = new THREE.Quaternion().setFromAxisAngle(s.axis, s.spin0 + s.spin * t);
+    s.mesh.quaternion.copy(spinQ.slerp(qI, e));
+  }
+  // rings: gyroscope tumble -> settle into the halo, pearls keep running along them
+  rings.forEach((r, k) => {
+    const chaos = new THREE.Quaternion().setFromEuler(new THREE.Euler(r.w[0] * t + r.ph, r.w[1] * t, r.w[2] * t + r.ph * 0.5));
+    const settle = expoInOut((t - 4.6 - 0.25 * k) / 2.8);
+    r.m.quaternion.copy(chaos.slerp(r.final, settle));
+    r.m.position.set(0, 0, -0.07);
+    const sc = lerp(0.82, 1.0, smooth((t - 1.0) / 4));
+    r.m.scale.setScalar(sc);
+    r.pearls.forEach((p, j) => { const a = t * (0.45 + 0.12 * j) * (k % 2 ? -1 : 1) + j * 2.1 + k; p.position.set(Math.cos(a) * r.R, Math.sin(a) * r.R, 0); });
+  });
+  // decor: orbit inside the swarm, then spread outward and dissolve as the camera pulls away
+  for (const d of decor) {
+    const spread = 1 + 3.0 * smooth((t - 5.3) / 2.6);
+    const ang = d.a0 + d.w * t * Math.PI * 2 * 0.22;
+    d.m.position.copy(new THREE.Vector3(Math.cos(ang) * d.R * spread, 0, Math.sin(ang) * d.R * spread).applyQuaternion(d.tilt));
+    d.m.quaternion.setFromAxisAngle(d.axis, d.spin * t);
+    d.m.scale.setScalar(d.size * (1 - smooth((t - 6.6) / 1.3)) + 1e-5);
+  }
+  // light: neutral studio while it assembles, flooding purple as the camera pulls out
+  const p = smooth((t - 5.2) / 3.0);
+  key.color.setRGB(lerp(1.0, 0.86, p), lerp(1.0, 0.78, p), 1.0);
+  key.intensity = lerp(2.4, 1.25, p);
+  amb.color.setRGB(lerp(0.56, 0.55, p), lerp(0.50, 0.32, p), lerp(0.69, 0.85, p));
+  amb.intensity = lerp(0.35, 0.55, p);
+  rimA.intensity = lerp(0.6, 9.0, p); rimB.intensity = lerp(0.3, 5.0, p); rimC.intensity = lerp(0.3, 4.0, p);
+  scene.environmentIntensity = lerp(1.0, 0.62, p);
+  // info for the compositor: where the backlight sits on screen, and the logo's projected size
+  const lp = new THREE.Vector3(0, 0.08, -0.6).project(camera);
+  const top = new THREE.Vector3(0, 0.5, 0).project(camera), bot = new THREE.Vector3(0, -0.5, 0).project(camera);
+  const c0 = new THREE.Vector3(0, 0, 0).project(camera);
+  return { light: [(lp.x + 1) / 2 * W, (1 - lp.y) / 2 * H], logo: [(c0.x + 1) / 2 * W, (1 - c0.y) / 2 * H, (top.y - bot.y) / 2 * H], kb };
+}
+
+const gl = renderer.getContext();
+const buf = new Uint8Array(W * H * 4);
+window.renderFrame = async (f) => {
+  const info = update(f / FPS);
+  renderer.render(scene, camera);
+  gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+  await fetch('/frame', { method: 'POST', body: buf });
+  return info;
+};
+window.READY = true;
+</script>
+</body>
+</html>
