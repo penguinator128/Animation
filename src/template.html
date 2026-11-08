@@ -1,0 +1,179 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>ASTRIS Reveal</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+// ASTRIS productions: 10 s logo reveal. Everything is a pure function of t inside seek(t).
+// Geometry is traced from the supplied logo file (assets/astris-logo-source.jpg), never redrawn.
+const G = __GEOM__;
+const W = 1920, H = 1080, BPM = 90, B = 60 / BPM, DUR = 10;
+const COLORS = ['#E40303', '#FF8C00', '#FFED00', '#008026', '#004DFF', '#750787'];
+const Y0 = 101, Y1 = 1209, BH = (Y1 - Y0) / 6;          // six pride bands across the logo height
+const LOGO_C = [787, 655];
+const AX = Math.hypot(485, 969), U = [-485 / AX, 969 / AX]; // film axis, pointing down-left
+const PITCH = 77.4;                                       // sprocket pitch along the axis
+const LAND = 11 * B;                                      // the downbeat the logo lands on
+
+// ---------- easing, all functions of time ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const spring = (tau, w) => tau <= 0 ? 0 : 1 - (1 + w * tau) * Math.exp(-w * tau); // critically damped, no overshoot
+const expOut = (tau, k) => tau <= 0 ? 0 : 1 - Math.exp(-k * tau);
+const expIn = x => x <= 0 ? 0 : x >= 1 ? 1 : (Math.pow(2, 10 * x) - 1) / 1023;
+const expInOut = x => { x = clamp(x); return x < .5 ? expIn(2 * x) / 2 : 1 - expIn(2 - 2 * x) / 2; };
+
+// monotone cubic (Fritsch–Carlson) through keyframes: smooth, never overshoots
+function mono(keys) {
+  const n = keys.length, xs = keys.map(k => k[0]), ys = keys.map(k => k[1]);
+  const d = [], m = [];
+  for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+  m[0] = d[0]; m[n - 1] = d[n - 2];
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+  for (let i = 0; i < n - 1; i++) {
+    if (d[i] === 0) { m[i] = m[i + 1] = 0; continue; }
+    const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+    if (s > 9) { const k = 3 / Math.sqrt(s); m[i] = k * a * d[i]; m[i + 1] = k * b * d[i]; }
+  }
+  return x => {
+    if (x <= xs[0]) return ys[0];
+    if (x >= xs[n - 1]) return ys[n - 1];
+    let i = 0; while (x > xs[i + 1]) i++;
+    const h = xs[i + 1] - xs[i], s = (x - xs[i]) / h, s2 = s * s, s3 = s2 * s;
+    return (2 * s3 - 3 * s2 + 1) * ys[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * ys[i + 1] + (s3 - s2) * h * m[i + 1];
+  };
+}
+
+// ---------- the film: a projector gate that spins up bar by bar ----------
+// pickup: every 2 beats, bar 1: every beat, bar 2: every half beat, then the landing.
+const FILM_STEPS = [
+  [0, 2, 9], [2, 2, 9],
+  [3, 1, 15], [4, 1, 15], [5, 1, 15], [6, 1, 15],
+  [7, 1, 24], [7.5, 1, 24], [8, 1, 24], [8.5, 1, 24], [9, 1, 24], [9.5, 1, 24], [10, 1, 24], [10.5, 1, 24],
+]; // [beat, pitches, spring omega]
+const LAND_PITCHES = 2, LAND_START = 10.75 * B;
+const FILM_TOTAL = FILM_STEPS.reduce((s, x) => s + x[1], 0) + LAND_PITCHES;
+function filmD(t) { // distance (world px) still to travel along U
+  if (t >= LAND) return 0;
+  let done = 0;
+  for (const [b, p, w] of FILM_STEPS) done += p * spring(t - b * B, w);
+  done += LAND_PITCHES * expIn((t - LAND_START) / (LAND - LAND_START));
+  return PITCH * (FILM_TOTAL - done);
+}
+
+// ---------- the bar: six pride stripes, flag first, then they lean into the A ----------
+const xL = y => 615 + (y - 101) * (553 / 1108), xR = y => 891 + (y - 101) * (554 / 1108);
+const FX0 = 1000, FX1 = 1760, SHIFT = 430;
+const ENTER = [4, 5, 5.5, 6, 6.5, 7].map(b => b * B);
+const LEAN = [8, 8.3, 8.6, 8.9, 9.2, 9.5].map(b => b * B);
+const SLIDE_START = 10 * B;
+function stripeQuad(i, t) {
+  const ya = Y0 + i * BH, yb = ya + BH;
+  const tau = t - ENTER[i];
+  if (tau < 0) return null;
+  const off = 2600 * (1 - expOut(tau, 7.5));
+  const flag = [FX0 + off, FX1 + off, FX1 + off, FX0 + off];
+  const lean = [xL(ya) + SHIFT, xR(ya) + SHIFT, xR(yb) + SHIFT, xL(yb) + SHIFT];
+  const k = spring(t - LEAN[i], 11);
+  const slide = SHIFT * expIn((t - SLIDE_START) / (LAND - SLIDE_START));
+  const xs = flag.map((x, j) => lerp(x, lean[j], k) - slide);
+  return [[xs[0], ya], [xs[1], ya], [xs[2], yb], [xs[3], yb]];
+}
+
+// ---------- camera ----------
+const filmTrack = b => { const d = filmD(b * B); return [640 + d * U[0], 520 + d * U[1]]; };
+const camKeys = (() => {
+  const t0 = filmTrack(0.35), t2 = filmTrack(2.3), t3 = filmTrack(3.3), t5 = filmTrack(5.0);
+  return {
+    x: mono([[0, t0[0]], [2.3 * B, t2[0]], [3.3 * B, t3[0]], [5 * B, lerp(t5[0], 800, .35)], [7 * B, 780], [8.5 * B, 800], [10.5 * B, LOGO_C[0]]]),
+    y: mono([[0, t0[1]], [2.3 * B, t2[1]], [3.3 * B, t3[1]], [5 * B, lerp(t5[1], 950, .35)], [7 * B, 1010], [8.5 * B, 900], [10.5 * B, LOGO_C[1]]]),
+    ls: mono([[0, Math.log(2.5)], [2.3 * B, Math.log(2.25)], [3.3 * B, Math.log(1.8)], [5 * B, Math.log(0.95)], [7 * B, Math.log(0.56)], [8.5 * B, Math.log(0.55)], [10.5 * B, Math.log(0.68)]]),
+    r: mono([[0, 1.107], [2.3 * B, 1.07], [3.3 * B, 0.95], [5 * B, 0.55], [7 * B, 0.2], [8.5 * B, 0.05], [10 * B, 0]]),
+  };
+})();
+function camera(t) {
+  let x = camKeys.x(t), y = camKeys.y(t), s = Math.exp(camKeys.ls(t)), r = camKeys.r(t);
+  if (t > LAND) s *= 1 + 0.06 * expOut(t - LAND, 0.6); // the hold keeps breathing: slow push-in
+  return { x, y, s, r };
+}
+const bandDrift = t => 0; // colours stay locked once the logo lands
+
+// ---------- drawing ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const off = document.createElement('canvas'); off.width = W; off.height = H;
+const octx = off.getContext('2d');
+const filmBase = new Path2D(), holesPolys = G.holes;
+
+function polyPath(p, pts, dx = 0, dy = 0) {
+  p.moveTo(pts[0][0] + dx, pts[0][1] + dy);
+  for (let i = 1; i < pts.length; i++) p.lineTo(pts[i][0] + dx, pts[i][1] + dy);
+  p.closePath();
+}
+function fillBands(c, drift) {
+  for (let k = -30; k < 36; k++) {
+    c.fillStyle = COLORS[((k % 6) + 6) % 6];
+    c.fillRect(-6000, Y0 + drift + k * BH, 14000, BH + 2); // overlap hides seams; next band paints over
+  }
+}
+function drawScene(c, t) {
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.fillStyle = '#000'; c.fillRect(0, 0, W, H);
+  const cam = camera(t), co = Math.cos(cam.r) * cam.s, si = Math.sin(cam.r) * cam.s;
+  c.setTransform(co, si, -si, co, W / 2 - (co * cam.x - si * cam.y), H / 2 - (si * cam.x + co * cam.y));
+  const drift = bandDrift(t);
+  // film window
+  const d = filmD(t), fx = d * U[0], fy = d * U[1];
+  const fp = new Path2D(); polyPath(fp, G.film, fx, fy);
+  for (const h of holesPolys) polyPath(fp, h, fx, fy);
+  c.save(); c.clip(fp, 'evenodd'); fillBands(c, drift); c.restore();
+  // bar window
+  if (t >= LAND) {
+    const bp = new Path2D(); polyPath(bp, G.bar);
+    c.save(); c.clip(bp); fillBands(c, drift); c.restore();
+  } else {
+    for (let i = 0; i < 6; i++) {
+      const q = stripeQuad(i, t); if (!q) continue;
+      const p = new Path2D(); polyPath(p, q);
+      c.fillStyle = COLORS[i]; c.fill(p);
+    }
+  }
+}
+
+// screen-space speed of the fastest thing on screen, used to pick blur sample count
+function screenPts(t) {
+  const cam = camera(t), co = Math.cos(cam.r) * cam.s, si = Math.sin(cam.r) * cam.s;
+  const tr = (x, y) => [co * (x - cam.x) - si * (y - cam.y), si * (x - cam.x) + co * (y - cam.y)];
+  const d = filmD(t), pts = [tr(G.film[0][0] + d * U[0], G.film[0][1] + d * U[1]), tr(129 + d * U[0], 1209 + d * U[1])];
+  for (let i = 0; i < 6; i++) { const q = stripeQuad(i, t); if (q) { pts.push(tr(...q[0]), tr(...q[2])); } else pts.push([0, 0], [0, 0]); }
+  return pts;
+}
+
+// seek(t, shutter): average of the scene across [t - shutter, t]. Blur follows speed and direction
+// because it IS the motion: every sample is the scene at an earlier instant.
+let acc = null;
+window.seek = function (t, shutter = 0) {
+  t = clamp(t, 0, DUR);
+  let n = 1;
+  if (shutter > 0) {
+    const a = screenPts(t), b = screenPts(Math.max(0, t - shutter));
+    let m = 0; for (let i = 0; i < a.length; i++) m = Math.max(m, Math.hypot(a[i][0] - b[i][0], a[i][1] - b[i][1]));
+    n = Math.min(32, Math.max(1, Math.ceil(m / 1.5)));
+  }
+  if (n === 1) { drawScene(ctx, t); return 1; }
+  if (!acc) acc = new Float32Array(W * H * 3);
+  acc.fill(0);
+  for (let k = 0; k < n; k++) {
+    drawScene(octx, Math.max(0, t - shutter * (k + 0.5) / n));
+    const px = octx.getImageData(0, 0, W, H).data;
+    for (let i = 0, j = 0; i < px.length; i += 4, j += 3) { acc[j] += px[i]; acc[j + 1] += px[i + 1]; acc[j + 2] += px[i + 2]; }
+  }
+  const img = ctx.createImageData(W, H), o = img.data, inv = 1 / n;
+  for (let i = 0, j = 0; i < o.length; i += 4, j += 3) { o[i] = acc[j] * inv + .5; o[i + 1] = acc[j + 1] * inv + .5; o[i + 2] = acc[j + 2] * inv + .5; o[i + 3] = 255; }
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.putImageData(img, 0, 0);
+  return n;
+};
+window.TIMING = { B, LAND, DUR };
+seek(new URLSearchParams(location.search).has('t') ? +new URLSearchParams(location.search).get('t') : LAND + 1);
+</script>
+<script src="audio.js"></script>
+</body></html>
