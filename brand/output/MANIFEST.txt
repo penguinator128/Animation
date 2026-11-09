@@ -1,0 +1,134 @@
+ASTRIS PRODUCTIONS - brand package manifest
+============================================
+
+VIDEOS  (videos/)   3840x2160 . 24 fps . H.264 High yuv420p CRF 15 . AAC 320k 48 kHz stereo
+
+  astris-hero-1-go-crazy.mp4              10.00 s   240 frames    139.8 MB   ok
+  astris-hero-2-3d-reveal.mp4             10.00 s   240 frames    175.4 MB   ok
+  astris-hero-3-style-switcher.mp4        10.00 s   240 frames    119.2 MB   ok
+  astris-hero-4-quick-ident.mp4            3.00 s    72 frames     24.1 MB   ok
+  astris-ident-01.mp4                      5.75 s   138 frames     61.4 MB   ok
+  astris-ident-02.mp4                      6.40 s   153 frames    110.9 MB   ok
+  astris-ident-03.mp4                      5.00 s   120 frames     94.6 MB   ok
+  astris-ident-04.mp4                      9.00 s   216 frames    155.0 MB   ok
+  astris-ident-05.mp4                      4.20 s   100 frames     41.0 MB   ok
+  astris-ident-06.mp4                      3.00 s    72 frames     34.1 MB   ok
+  astris-ident-07.mp4                      7.00 s   168 frames    113.3 MB   ok
+  astris-ident-08.mp4                      4.00 s    96 frames     65.9 MB   ok
+  astris-ident-09.mp4                      6.00 s   144 frames    175.7 MB   ok
+  astris-ident-10.mp4                      5.00 s   120 frames    111.8 MB   ok
+  astris-ident-11.mp4                      5.00 s   120 frames    101.9 MB   ok
+  astris-idents-master.mp4                66.15 s  1587 frames   1065.7 MB   ok
+  astris-bonus-01.mp4                      5.50 s   132 frames     63.5 MB   ok
+  astris-bonus-02.mp4                      7.00 s   168 frames    102.0 MB   ok
+  astris-bonus-03.mp4                      7.00 s   168 frames     99.0 MB   ok
+  astris-bonus-04.mp4                      6.00 s   144 frames     54.9 MB   ok
+  astris-bonus-05.mp4                      6.50 s   156 frames     91.2 MB   ok
+
+  21 videos, 3.00 GB
+
+  timestamps.txt (where each ident sits in the master):
+
+    ASTRIS PRODUCTIONS - idents master  (astris-idents-master.mp4)
+    11 idents in order, 0.583 s (14 frames) of black between each.  24 fps.  Total 01:06.125 (1587 frames).
+    Times are minutes:seconds.  'end' is the moment the ident's last frame finishes.
+    
+    #   file                            start        end    length   frames (start-end)
+    01  astris-ident-01.mp4         00:00.000  00:05.750    5.750s   0-137
+    02  astris-ident-02.mp4         00:06.333  00:12.708    6.375s   152-304
+    03  astris-ident-03.mp4         00:13.292  00:18.292    5.000s   319-438
+    04  astris-ident-04.mp4         00:18.875  00:27.875    9.000s   453-668
+    05  astris-ident-05.mp4         00:28.458  00:32.625    4.167s   683-782
+    06  astris-ident-06.mp4         00:33.208  00:36.208    3.000s   797-868
+    07  astris-ident-07.mp4         00:36.792  00:43.792    7.000s   883-1050
+    08  astris-ident-08.mp4         00:44.375  00:48.375    4.000s   1065-1160
+    09  astris-ident-09.mp4         00:48.958  00:54.958    6.000s   1175-1318
+    10  astris-ident-10.mp4         00:55.542  01:00.542    5.000s   1333-1452
+    11  astris-ident-11.mp4         01:01.125  01:06.125    5.000s   1467-1586
+
+AUDIO  (audio/)   24-bit / 48 kHz stereo WAV, same mix as the video
+
+  astris-bonus-01.wav                      5.50 s    1.58 MB  ok
+  astris-bonus-02.wav                      7.00 s    2.02 MB  ok
+  astris-bonus-03.wav                      7.00 s    2.02 MB  ok
+  astris-bonus-04.wav                      6.00 s    1.73 MB  ok
+  astris-bonus-05.wav                      6.50 s    1.87 MB  ok
+  astris-hero-1-go-crazy.wav              10.00 s    2.88 MB  ok
+  astris-hero-2-3d-reveal.wav             10.00 s    2.88 MB  ok
+  astris-hero-3-style-switcher.wav        10.00 s    2.88 MB  ok
+  astris-hero-4-quick-ident.wav            3.00 s    0.86 MB  ok
+  astris-ident-01.wav                      5.75 s    1.66 MB  ok
+  astris-ident-02.wav                      6.40 s    1.84 MB  ok
+  astris-ident-03.wav                      5.00 s    1.44 MB  ok
+  astris-ident-04.wav                      9.00 s    2.59 MB  ok
+  astris-ident-05.wav                      4.20 s    1.21 MB  ok
+  astris-ident-06.wav                      3.00 s    0.86 MB  ok
+  astris-ident-07.wav                      7.00 s    2.02 MB  ok
+  astris-ident-08.wav                      4.00 s    1.15 MB  ok
+  astris-ident-09.wav                      6.00 s    1.73 MB  ok
+  astris-ident-10.wav                      5.00 s    1.44 MB  ok
+  astris-ident-11.wav                      5.00 s    1.44 MB  ok
+  astris-idents-master.wav                66.12 s   19.04 MB  ok
+
+STILLS  (stills/2000 and stills/150)   transparent badge logos, no text
+
+  logo-01-mini-switcher.png      2000x2000  0.80 MB  |  150x150  15.6 KB   ok
+  logo-02-scribble.png           2000x2000  3.95 MB  |  150x150  34.7 KB   ok
+  logo-03-graffiti.png           2000x2000  0.15 MB  |  150x150  10.3 KB   ok
+  logo-04-flythrough.png         2000x2000  0.56 MB  |  150x150  18.2 KB   ok
+  logo-05-prism.png              2000x2000  0.73 MB  |  150x150  18.1 KB   ok
+  logo-06-glitch.png             2000x2000  0.10 MB  |  150x150   7.0 KB   ok
+  logo-07-ink.png                2000x2000  2.36 MB  |  150x150  22.5 KB   ok
+  logo-08-cutout.png             2000x2000  0.93 MB  |  150x150  10.7 KB   ok
+  logo-09-16mm.png               2000x2000  1.51 MB  |  150x150  17.3 KB   ok
+  logo-10-sunburst.png           2000x2000  0.24 MB  |  150x150  20.9 KB   ok
+  logo-11-synthwave.png          2000x2000  0.76 MB  |  150x150  21.8 KB   ok
+  logo-bonus-01.png              2000x2000  0.77 MB  |  150x150  24.4 KB   ok
+  logo-bonus-02.png              2000x2000  1.00 MB  |  150x150  27.9 KB   ok
+  logo-bonus-03.png              2000x2000  1.58 MB  |  150x150  36.1 KB   ok
+  logo-bonus-04.png              2000x2000  0.02 MB  |  150x150   8.8 KB   ok
+  logo-bonus-05.png              2000x2000  1.21 MB  |  150x150  30.5 KB   ok
+  logo-hero-1.png                2000x2000  0.45 MB  |  150x150  20.0 KB   ok
+  logo-hero-2.png                2000x2000  0.46 MB  |  150x150  16.3 KB   ok
+  logo-hero-3.png                2000x2000  0.82 MB  |  150x150  21.0 KB   ok
+  logo-hero-4.png                2000x2000  0.37 MB  |  150x150  11.6 KB   ok
+  stills-overview.png  2140x2250
+
+BANNERS  (banners/)   2560x1440 PNG, < 6 MB, logo + type inside the 1546x423 safe area
+
+  banner-1-retro-grainy.png                  2560x1440   3.95 MB  safe-area margins [175, 175, 46, 47]  ok
+  banner-2-retro-vhs.png                     2560x1440   1.08 MB  safe-area margins [150, 111, 36, 57]  ok
+  banner-3-retro-70s.png                     2560x1440   3.79 MB  safe-area margins [146, 146, 51, 52]  ok
+  banner-4-surprise-constellation.png        2560x1440   3.10 MB  safe-area margins [51, 51, 41, 42]  ok
+  banner-bonus-blueprint.png                 2560x1440   3.01 MB  safe-area margins [249, 249, 51, 52]  ok
+  banner-bonus-neon.png                      2560x1440   3.21 MB  safe-area margins [63, 63, 51, 52]  ok
+  banner-bonus-rainbow-collage.png           2560x1440   3.73 MB  safe-area margins [226, 226, 56, 57]  ok
+
+PROFILE PICTURES  (profiles/)   1600x1600 + 800x800, circle-safe
+
+  profile-1-retro-grainy-1600.png              + -800    2.79 / 0.85 MB   logo reaches 596.4 px of 800   ok
+  profile-2-retro-vhs-1600.png                 + -800    1.06 / 0.38 MB   logo reaches 518.5 px of 800   ok
+  profile-3-retro-70s-1600.png                 + -800    2.73 / 0.83 MB   logo reaches 549.8 px of 800   ok
+  profile-4-surprise-constellation-1600.png    + -800    2.30 / 0.72 MB   logo reaches 596.4 px of 800   ok
+  profile-bonus-blueprint-1600.png             + -800    0.30 / 0.16 MB   logo reaches 565.4 px of 800   ok
+  profile-bonus-neon-1600.png                  + -800    2.28 / 0.69 MB   logo reaches 565.4 px of 800   ok
+  profile-bonus-rainbow-collage-1600.png       + -800    2.31 / 0.70 MB   logo reaches 549.8 px of 800   ok
+
+PREVIEWS  (previews/)
+
+  preview-banner-1-retro-grainy.png                    2200x3715
+  preview-banner-2-retro-vhs.png                       2200x3715
+  preview-banner-3-retro-70s.png                       2200x3715
+  preview-banner-4-surprise-constellation.png          2200x3715
+  preview-banner-bonus-blueprint.png                   2200x3715
+  preview-banner-bonus-neon.png                        2200x3715
+  preview-banner-bonus-rainbow-collage.png             2200x3715
+  preview-profile-1-retro-grainy.png                   2200x1180
+  preview-profile-2-retro-vhs.png                      2200x1180
+  preview-profile-3-retro-70s.png                      2200x1180
+  preview-profile-4-surprise-constellation.png         2200x1180
+  preview-profile-bonus-blueprint.png                  2200x1180
+  preview-profile-bonus-neon.png                       2200x1180
+  preview-profile-bonus-rainbow-collage.png            2200x1180
+
+RESULT: all checks passed

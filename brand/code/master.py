@@ -69,7 +69,17 @@ def main():
         assert (a["codec_name"], a["sample_rate"], a["channels"]) == ("aac", "48000", 2), name
         n = int(v["nb_read_packets"])
         pcm = read_wav24(wav)
-        assert len(pcm) == n * SR // FPS, f"{name}: wav {len(pcm)} samples vs {n} frames"
+        want = n * SR // FPS
+        if len(pcm) != want:
+            # durations that aren't a whole number of frames (6.4 s, 4.2 s) lose their last part-frame of picture
+            # in the MP4; trim the sound to the picture (with a 15 ms fade so the cut can't click), or pad silence
+            print(f"  {name}: wav {len(pcm)} samples -> {want} to match its {n} frames")
+            if len(pcm) > want:
+                pcm = pcm[:want].copy()
+                k = int(0.015 * SR)
+                pcm[-k:] *= (0.5 + 0.5 * np.cos(np.linspace(0, np.pi, k)))[:, None]
+            else:
+                pcm = np.concatenate([pcm, np.zeros((want - len(pcm), 2))])
         clips.append({"name": name, "frames": n, "pcm": pcm, "mp4": mp4})
 
     # black gap clip, same encoder settings as every ident (video only is used)

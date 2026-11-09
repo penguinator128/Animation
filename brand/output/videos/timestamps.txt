@@ -1,0 +1,16 @@
+ASTRIS PRODUCTIONS - idents master  (astris-idents-master.mp4)
+11 idents in order, 0.583 s (14 frames) of black between each.  24 fps.  Total 01:06.125 (1587 frames).
+Times are minutes:seconds.  'end' is the moment the ident's last frame finishes.
+
+#   file                            start        end    length   frames (start-end)
+01  astris-ident-01.mp4         00:00.000  00:05.750    5.750s   0-137
+02  astris-ident-02.mp4         00:06.333  00:12.708    6.375s   152-304
+03  astris-ident-03.mp4         00:13.292  00:18.292    5.000s   319-438
+04  astris-ident-04.mp4         00:18.875  00:27.875    9.000s   453-668
+05  astris-ident-05.mp4         00:28.458  00:32.625    4.167s   683-782
+06  astris-ident-06.mp4         00:33.208  00:36.208    3.000s   797-868
+07  astris-ident-07.mp4         00:36.792  00:43.792    7.000s   883-1050
+08  astris-ident-08.mp4         00:44.375  00:48.375    4.000s   1065-1160
+09  astris-ident-09.mp4         00:48.958  00:54.958    6.000s   1175-1318
+10  astris-ident-10.mp4         00:55.542  01:00.542    5.000s   1333-1452
+11  astris-ident-11.mp4         01:01.125  01:06.125    5.000s   1467-1586

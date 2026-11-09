@@ -1,7 +1,0 @@
-ident11_synthwave.py
-ident03_graffiti.py
-bonus01_neon.py
-bonus02_constellation.py
-bonus03_fireworks.py
-bonus04_arcade.py
-bonus05_bubbles.py

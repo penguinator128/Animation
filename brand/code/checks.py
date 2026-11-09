@@ -77,7 +77,7 @@ def main():
                 vd = int(probe(vid)["streams"][0]["nb_read_packets"]) / 24
             except subprocess.CalledProcessError:
                 vd = -1
-            match = ok(abs(n / sr - vd) < 0.01, f"wav length vs video: {p.name}")
+            match = ok(abs(n / sr - vd) < 1 / 24 + 0.001, f"wav length vs video: {p.name}")     # within a frame
         ok(sr == 48000 and ch == 2 and sw == 3, f"wav format: {p.name}")
         lines.append(f"  {p.name:<38} {n / sr:6.2f} s  {mb(p):6.2f} MB  {match}")
     lines.append("")

@@ -9,17 +9,14 @@ Working notes so an overnight run can always resume. Code: `brand/code/`. Output
 4. Banners (2560x1440 < 6 MB, safe area 1546x423) + profiles (1600 + 800, circle-safe)
 5. Previews (banner desktop/tablet/phone crops, profile circles), then bonus idents (astris-bonus-01..)
 
-## Status (16:10)
-- [x] Restructure into brand/code + brand/output
-- [x] Heroes 1-4 (hero 2 re-rendered with 3D text)
-- [x] Idents 01, 02, 04, 05, 06, 07, 08, 09 rendered + reviewed from the encodes (review.py)
-- [~] Idents 10, 11, 03 rendering (queue.sh), then bonus 01-05
-- [ ] Master: `python3 master.py` once all 11 idents exist (video stream-copied, audio rebuilt sample-exact from WAVs)
-- [x] Stills: 20 badges (heroes, idents, bonus 01-05) + overview
-- [x] Banners + profiles (7 sets), safe-area + circle checks in logs/safe_area.json
-- [x] Previews (banner crops + channel mock-ups, profile circles at real sizes)
-- [x] Bonus idents designed + tested: 01 neon, 02 constellation, 03 fireworks, 04 arcade level-up, 05 soap bubbles
-- [ ] `python3 checks.py` -> output/MANIFEST.txt, then README, commit (no mp4s), deliver
+## Status: complete (20:45)
+- [x] Heroes 1-4, idents 01-11, bonus 01-05 rendered and reviewed from the encodes (review.py)
+- [x] Master (1:06.125, 0.583 s black gaps) + timestamps.txt; picture bit-identical to the sources at the joins,
+      sound offset 0 samples, gaps digital silence
+- [x] Stills (20 badges, 2000 + 150 px) + overview
+- [x] Banners + profiles (7 sets), previews (14)
+- [x] checks.py: all checks passed -> output/MANIFEST.txt
+- [x] Committed (no mp4s) and delivered
 
 ## Notes
 - OpenCV only anti-aliases on 8-bit images: line art for stills/banners/bonus idents is drawn on uint8 layers.
