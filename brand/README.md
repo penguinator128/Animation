@@ -82,8 +82,9 @@ python3 review.py ../output/videos/astris-ident-05.mp4   # contact sheet from a 
 sample-exactly from the original WAV masters and encoded once, because stream-copying AAC across files shifts the
 sound by the encoder's start-up padding at every join. So nothing is encoded twice, and every join is in sync
 (checked: the picture is bit-identical to each ident, and each ident's sound lands at 0 samples offset).
-`python3 master.py --parts DIR` also writes the master as three self-contained pieces (idents 01–04, 05–08,
-09–11), built the same way, for places with an upload size limit.
+`python3 master.py --parts DIR` also writes the master as self-contained pieces for places with an upload size
+limit, built the same way: `part1of3-a` (idents 01–02), `part1of3-b` (03–04), `part2of3` (05–08), `part3of3` (09–11).
+Played back to back they are exactly the master.
 
 **Swapping the logo:** `code/common.py` has `LOGO_PATH` at the very top. Leave it empty to auto-detect
 `logo.svg` / `logo.png` / `logo.jpg` next to the scripts or in the repo root, falling back to

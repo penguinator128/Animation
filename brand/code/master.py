@@ -174,15 +174,16 @@ def main():
     if "--parts" in sys.argv:
         pdir = Path(sys.argv[sys.argv.index("--parts") + 1])
         pdir.mkdir(parents=True, exist_ok=True)
-        groups = [(0, 4), (4, 8), (8, 11)]
-        for j, (i0, i1) in enumerate(groups, 1):
-            sub = [] if j == 1 else ["GAP"]
+        # part 1 is split in two halves to stay under a 400 MiB upload limit
+        groups = [((0, 2), "part1of3-a"), ((2, 4), "part1of3-b"), ((4, 8), "part2of3"), ((8, 11), "part3of3")]
+        for j, ((i0, i1), tag) in enumerate(groups, 1):
+            sub = [] if i0 == 0 else ["GAP"]
             for k in range(i0, i1):
                 sub.append(clips[k])
                 if k < i1 - 1:
                     sub.append("GAP")
-            po = pdir / f"{NAME}-part{j}of3.mp4"
-            r, n, pv, pa = assemble(sub, po, WORK / f"part{j}.wav", gap_v, f"list_part{j}.txt")
+            po = pdir / f"{NAME}-{tag}.mp4"
+            r, n, pv, pa = assemble(sub, po, WORK / f"{tag}.wav", gap_v, f"list_{tag}.txt")
             print(f"wrote {po.name}  {po.stat().st_size / 1e6:.1f} MB  {n} frames  idents {i0 + 1:02d}-{i1:02d}")
 
 
