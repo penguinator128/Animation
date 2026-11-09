@@ -11,6 +11,8 @@ is exact at every join (stream-copying AAC across files drifts by its 1024-sampl
 Usage: python3 master.py
 """
 import json
+import sys
+from pathlib import Path
 import subprocess
 import wave
 
@@ -56,6 +58,49 @@ def tc(sec):
     return f"{int(m):02d}:{s:06.3f}"
 
 
+def assemble(seq, out, wav_out, gap_v, list_name):
+    """seq: ident clips and "GAP"s in order. Picture: concat of the video-only copies (stream copy).
+    Sound: the WAV masters laid end to end, sample-exact, digital silence in the gaps, encoded once."""
+    from sound import write_wav24
+    lines, parts, rows, frame = [], [], [], 0
+    for item in seq:
+        if item == "GAP":
+            lines += [f"file '{gap_v}'", f"duration {GAP_FRAMES / FPS:.6f}"]
+            parts.append(np.zeros((GAP_FRAMES * SR // FPS, 2)))
+            frame += GAP_FRAMES
+        else:
+            lines += [f"file '{item['vonly']}'", f"duration {item['frames'] / FPS:.6f}"]
+            rows.append((item["name"], frame, frame + item["frames"]))
+            parts.append(item["pcm"])
+            frame += item["frames"]
+    total_frames = frame
+    (WORK / list_name).write_text("\n".join(lines) + "\n")
+    audio = np.concatenate(parts)
+    assert len(audio) == total_frames * SR // FPS
+    write_wav24(wav_out, audio.T)
+    subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+                    "-f", "concat", "-safe", "0", "-i", str(WORK / list_name), "-i", str(wav_out),
+                    "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy",
+                    "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-ac", "2",
+                    "-movflags", "+faststart", str(out)], check=True)
+    # checks: frame count, both streams start together, lengths match, every frame decodes, even timing
+    info = probe(out)
+    v = next(s for s in info["streams"] if s["codec_type"] == "video")
+    a = next(s for s in info["streams"] if s["codec_type"] == "audio")
+    assert int(v["nb_read_packets"]) == total_frames, (v["nb_read_packets"], total_frames)
+    dv, da = float(v["duration"]), float(a["duration"])
+    sv, sa = float(v.get("start_time", 0)), float(a.get("start_time", 0))
+    assert abs(sv - sa) < 0.001, f"picture starts at {sv:.4f} s but sound at {sa:.4f} s"
+    assert abs(dv - total_frames / FPS) < 0.002 and abs(da - dv) < 0.03, (dv, da, total_frames / FPS)
+    err = subprocess.run(["ffmpeg", "-v", "error", "-i", str(out), "-f", "null", "-"], capture_output=True, text=True).stderr
+    assert not err.strip(), err[:2000]
+    pts = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "packet=pts_time",
+                          "-of", "csv=p=0", str(out)], capture_output=True, text=True, check=True).stdout.split()
+    steps = np.diff(np.sort(np.array([float(t) for t in pts if t])))
+    assert np.allclose(steps, 1 / FPS, atol=0.0015), f"uneven frame timing: {steps.min():.4f}..{steps.max():.4f}"
+    return rows, total_frames, dv, da
+
+
 def main():
     WORK.mkdir(parents=True, exist_ok=True)
     clips = []
@@ -95,45 +140,22 @@ def main():
     for f in [c["mp4"] for c in clips] + [gap]:
         assert avcc(f) == ref, f"{f.name}: different SPS/PPS - stream copy would not be clean"
 
-    # concat list (picture) + one sample-exact audio master
-    lines, parts, rows, frame = [], [], [], 0
+    # video-only copies (stream copy): if the concat inputs still carried their AAC tracks, the demuxer would offset
+    # the picture by the AAC priming (21 ms) and the master's sound would lead its picture
+    for c in clips:
+        vo = WORK / f"{c['name']}-video.mp4"
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(c["mp4"]), "-map", "0:v:0", "-c", "copy", "-an", str(vo)], check=True)
+        c["vonly"] = vo
+    gap_v = WORK / "gap-video.mp4"
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", str(gap), "-map", "0:v:0", "-c", "copy", "-an", str(gap_v)], check=True)
+
+    seq = []
     for k, c in enumerate(clips):
-        lines += [f"file '{c['mp4']}'", f"duration {c['frames'] / FPS:.6f}"]
-        rows.append((c["name"], frame, frame + c["frames"]))
-        parts.append(c["pcm"])
-        frame += c["frames"]
+        seq.append(c)
         if k < len(clips) - 1:
-            lines += [f"file '{gap}'", f"duration {GAP_FRAMES / FPS:.6f}"]
-            parts.append(np.zeros((GAP_FRAMES * SR // FPS, 2)))
-            frame += GAP_FRAMES
-    total_frames = frame
-    (WORK / "list.txt").write_text("\n".join(lines) + "\n")
-    audio = np.concatenate(parts)
-    assert len(audio) == total_frames * SR // FPS
-    master_wav = AUD / f"{NAME}.wav"
-    write_wav24(master_wav, audio.T)
-
+            seq.append("GAP")
     out = VID / f"{NAME}.mp4"
-    subprocess.run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-                    "-f", "concat", "-safe", "0", "-i", str(WORK / "list.txt"), "-i", str(master_wav),
-                    "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy",
-                    "-c:a", "aac", "-b:a", "320k", "-ar", "48000", "-ac", "2",
-                    "-movflags", "+faststart", str(out)], check=True)
-
-    # checks: frame count, stream lengths, a clean decode of every frame
-    info = probe(out)
-    v = next(s for s in info["streams"] if s["codec_type"] == "video")
-    a = next(s for s in info["streams"] if s["codec_type"] == "audio")
-    assert int(v["nb_read_packets"]) == total_frames, (v["nb_read_packets"], total_frames)
-    dv, da = float(v["duration"]), float(a["duration"])
-    assert abs(dv - total_frames / FPS) < 0.002 and abs(da - dv) < 0.03, (dv, da, total_frames / FPS)
-    err = subprocess.run(["ffmpeg", "-v", "error", "-i", str(out), "-f", "null", "-"], capture_output=True, text=True).stderr
-    assert not err.strip(), err[:2000]
-    pts = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "packet=pts_time",
-                          "-of", "csv=p=0", str(out)], capture_output=True, text=True, check=True).stdout.split()
-    pts = np.sort(np.array([float(t) for t in pts if t]))
-    steps = np.diff(pts)
-    assert np.allclose(steps, 1 / FPS, atol=0.0015), f"uneven frame timing: {steps.min():.4f}..{steps.max():.4f}"
+    rows, total_frames, dv, da = assemble(seq, out, AUD / f"{NAME}.wav", gap_v, "list.txt")
 
     gap_s = GAP_FRAMES / FPS
     txt = [f"ASTRIS PRODUCTIONS - idents master  ({NAME}.mp4)",
@@ -147,6 +169,21 @@ def main():
     (VID / "timestamps.txt").write_text("\n".join(txt) + "\n")
     print("\n".join(txt))
     print(f"\nwrote {out}  {out.stat().st_size / 1e6:.1f} MB   video {dv:.3f}s  audio {da:.3f}s  clean decode, even timing")
+
+    # --parts DIR: the same master in three self-contained pieces (for upload limits), built the same way
+    if "--parts" in sys.argv:
+        pdir = Path(sys.argv[sys.argv.index("--parts") + 1])
+        pdir.mkdir(parents=True, exist_ok=True)
+        groups = [(0, 4), (4, 8), (8, 11)]
+        for j, (i0, i1) in enumerate(groups, 1):
+            sub = [] if j == 1 else ["GAP"]
+            for k in range(i0, i1):
+                sub.append(clips[k])
+                if k < i1 - 1:
+                    sub.append("GAP")
+            po = pdir / f"{NAME}-part{j}of3.mp4"
+            r, n, pv, pa = assemble(sub, po, WORK / f"part{j}.wav", gap_v, f"list_part{j}.txt")
+            print(f"wrote {po.name}  {po.stat().st_size / 1e6:.1f} MB  {n} frames  idents {i0 + 1:02d}-{i1:02d}")
 
 
 if __name__ == "__main__":

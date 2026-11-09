@@ -58,6 +58,8 @@ def main():
                     a and a["channels"] == 2, abs(nfr / 24 - dur) < 0.05])
         ok(good, f"video spec: {p.name}")
         ad = float(a["duration"]) if a else 0
+        ok(a is not None and abs(float(v.get("start_time", 0)) - float(a.get("start_time", 0))) < 0.001,
+           f"picture and sound must start together: {p.name}")
         ok(abs(ad - nfr / 24) < 0.05, f"audio/video length: {p.name} ({ad:.3f} vs {nfr / 24:.3f})")
         total += mb(p)
         lines.append(f"  {p.name:<38} {dur:6.2f} s  {nfr:4d} frames  {mb(p):7.1f} MB   {'ok' if good else 'CHECK'}")

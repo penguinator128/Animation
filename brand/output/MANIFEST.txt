@@ -18,7 +18,7 @@ VIDEOS  (videos/)   3840x2160 . 24 fps . H.264 High yuv420p CRF 15 . AAC 320k 48
   astris-ident-09.mp4                      6.00 s   144 frames    175.7 MB   ok
   astris-ident-10.mp4                      5.00 s   120 frames    111.8 MB   ok
   astris-ident-11.mp4                      5.00 s   120 frames    101.9 MB   ok
-  astris-idents-master.mp4                66.15 s  1587 frames   1065.7 MB   ok
+  astris-idents-master.mp4                66.12 s  1587 frames   1065.7 MB   ok
   astris-bonus-01.mp4                      5.50 s   132 frames     63.5 MB   ok
   astris-bonus-02.mp4                      7.00 s   168 frames    102.0 MB   ok
   astris-bonus-03.mp4                      7.00 s   168 frames     99.0 MB   ok
