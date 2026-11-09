@@ -1,8 +1,6 @@
 out/
 node_modules/
 __pycache__/
-# big renders live outside git (GitHub caps files at 100 MB); everything else in brand/output is committed
-brand/output/videos/*.mp4
 brand/code/test-frames/
 brand/code/logs/
 brand/code/cache/
