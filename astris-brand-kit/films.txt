@@ -1,0 +1,8 @@
+# ASTRIS PRODUCTIONS film list
+# One film per line. Edit this list, then re-run:  python3 code/build.py posters
+# Lines starting with # are ignored. Anything in (brackets) is printed small under the title.
+
+Two Face
+Charlie
+Ocean (working title)
+The Voice

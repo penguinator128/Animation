@@ -1,0 +1,127 @@
+{
+  "_readme": "Edit this file, then re-run the scripts in code/ to regenerate everything. Anything in [SQUARE BRACKETS] is a placeholder for you to fill in. See code/README.md.",
+
+  "brand": {
+    "name": "ASTRIS PRODUCTIONS",
+    "name_lowercase": "astris productions.",
+    "first_word": "ASTRIS",
+    "second_word": "PRODUCTIONS",
+    "presents_line": "ASTRIS PRODUCTIONS presents",
+    "about_short": "[PLACEHOLDER: one or two sentences about Astris Productions. Who you are, what kind of films you make, where you are based.]",
+    "about_long": "[PLACEHOLDER: a longer paragraph for the press kit and brand guide. How Astris started, what you care about, what you are working on now.]",
+    "end_card_line": "more stories this way."
+  },
+
+  "logo_version": "geometric",
+
+  "person": {
+    "name": "[YOUR NAME]",
+    "role": "[YOUR ROLE]",
+    "email": "[EMAIL ADDRESS]",
+    "phone": "[PHONE NUMBER]",
+    "website": "[WEBSITE]",
+    "location": "[CITY, STATE]",
+    "address": "[POSTAL ADDRESS]",
+    "abn": "[ABN]"
+  },
+
+  "social": {
+    "youtube": "[@YOUTUBE HANDLE]",
+    "instagram": "[@INSTAGRAM HANDLE]",
+    "tiktok": "[@TIKTOK HANDLE]",
+    "letterboxd": "[LETTERBOXD NAME]"
+  },
+
+  "films_note": "films.txt is the list the posters are made from. If films.txt is deleted, this list is used instead.",
+  "films": ["Two Face", "Charlie", "Ocean (working title)", "The Voice"],
+
+  "taglines": [
+    "welcome in.",
+    "pull up a chair.",
+    "stories, slowly.",
+    "made with friends.",
+    "small films, big feelings.",
+    "stay for the credits.",
+    "you're just in time.",
+    "films made by hand.",
+    "come see what we made.",
+    "make yourself at home.",
+    "bring snacks.",
+    "good stories, good company."
+  ],
+
+  "lower_thirds": [
+    {"name": "[YOUR NAME]", "title": "[YOUR ROLE]"},
+    {"name": "[GUEST NAME]", "title": "[GUEST TITLE]"},
+    {"name": "[CREW NAME]", "title": "[CREW ROLE]"}
+  ],
+
+  "instagram_highlights": ["Films", "Behind the Scenes", "Gear", "Edits", "Posters", "Intros", "News", "Q&A", "Crew", "Shorts", "Showreel", "Contact"],
+
+  "styles": {
+    "red": {
+      "name": "Red",
+      "number": 1,
+      "folder": "02_Style-1-Red",
+      "feel": "a warm, friendly, slightly humorous indie-filmmaker channel",
+      "tagline": "welcome in.",
+      "colours": {
+        "signature": {"hex": "#C23A3A", "name": "Brick Red"},
+        "light": {"hex": "#F4E3DA", "name": "Cream Pink"},
+        "dark": {"hex": "#1A1210", "name": "Warm Black"}
+      },
+      "proportions": {"signature": 70, "light": 20, "dark": 10},
+      "fonts": {"display": "anton-400", "text": "dm-sans"},
+      "schemes": {
+        "main": {"field": "signature", "ink": "light", "second": "dark"},
+        "dark": {"field": "dark", "ink": "light", "second": "signature"},
+        "light": {"field": "light", "ink": "signature", "second": "dark"}
+      },
+      "grain": {"amount": 0.075, "sigma": 0.55, "lift": 0.5},
+      "ink": {"bleed": 1.0, "rough": 1.0, "wear": 1.0}
+    },
+    "yellow": {
+      "name": "Yellow",
+      "number": 2,
+      "folder": "03_Style-2-Yellow",
+      "feel": "sunny, clapperboard-bright, welcoming and confident",
+      "tagline": "pull up a chair.",
+      "colours": {
+        "signature": {"hex": "#F2B705", "name": "Golden Yellow"},
+        "light": {"hex": "#F2EBDD", "name": "Warm Off-White"},
+        "dark": {"hex": "#141210", "name": "Near Black"}
+      },
+      "proportions": {"signature": 70, "light": 10, "dark": 20},
+      "fonts": {"display": "anton-400", "text": "inter"},
+      "schemes": {
+        "main": {"field": "signature", "ink": "dark", "second": "light"},
+        "dark": {"field": "dark", "ink": "signature", "second": "light"},
+        "light": {"field": "light", "ink": "dark", "second": "signature"}
+      },
+      "grain": {"amount": 0.075, "sigma": 0.55, "lift": 0.5},
+      "ink": {"bleed": 1.0, "rough": 0.9, "wear": 0.45}
+    },
+    "wildcard": {
+      "name": "Wildcard (Risograph)",
+      "number": 3,
+      "folder": "04_Style-3-Wildcard",
+      "feel": "friendly, handmade, a bit artsy, like a zine",
+      "tagline": "made with friends.",
+      "colours": {
+        "signature": {"hex": "#2C46B8", "name": "Ultramarine Ink"},
+        "second": {"hex": "#FF5E4D", "name": "Hot Coral Ink"},
+        "light": {"hex": "#F1E8D6", "name": "Cream Paper"},
+        "dark": {"hex": "#14182E", "name": "Ink Blue-Black"}
+      },
+      "proportions": {"light": 60, "signature": 25, "second": 10, "dark": 5},
+      "fonts": {"display": "anton-400", "text": "space-grotesk"},
+      "schemes": {
+        "main": {"mode": "riso", "field": "light", "ink": "signature", "second": "second", "shadow": 0.030, "misregister": [2.0, 1.4]},
+        "dark": {"mode": "riso", "field": "light", "ink": "signature", "second": "second", "flood": "ink", "misregister": [2.0, 1.4]},
+        "light": {"mode": "riso", "field": "light", "ink": "signature", "second": "second", "shadow": 0.030, "misregister": [2.0, 1.4]}
+      },
+      "grain": {"amount": 0.060, "sigma": 0.55, "lift": 0.6},
+      "ink": {"bleed": 1.0, "rough": 1.2, "wear": 1.3}
+    }
+  }
+}

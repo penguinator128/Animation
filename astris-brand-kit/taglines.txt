@@ -1,0 +1,22 @@
+ASTRIS PRODUCTIONS: supporting lines
+====================================
+Twelve options for the tiny line that sits under the name. All lowercase, all ending in a full stop,
+all meant to feel like an invitation in. Swap the one each style uses in brand-config.json ("tagline").
+
+ 1. welcome in.                    <- used by STYLE 1: RED
+ 2. pull up a chair.               <- used by STYLE 2: YELLOW
+ 3. stories, slowly.
+ 4. made with friends.             <- used by STYLE 3: WILDCARD
+ 5. small films, big feelings.
+ 6. stay for the credits.
+ 7. you're just in time.
+ 8. films made by hand.
+ 9. come see what we made.
+10. make yourself at home.
+11. bring snacks.
+12. good stories, good company.
+
+Why these three:
+  RED       "welcome in."        the warmest and shortest. It reads like a hand on the door.
+  YELLOW    "pull up a chair."   sunny and confident: an invitation with a smile.
+  WILDCARD  "made with friends." fits the handmade, zine feel of the two-ink print.
