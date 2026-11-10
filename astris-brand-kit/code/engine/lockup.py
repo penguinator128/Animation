@@ -23,11 +23,13 @@ def name_line(art, cx, y_mid, width, tagline=True, role="ink", tag_role=None, te
     face = art.style.display
     main = text or brand()["name_lowercase"]
     size = T.fit_size(main, face, width, TRACK_MAIN)
+    art.tag = "name"
     x0, yb, w = art.text(main, cx, y_mid, size, tracking=TRACK_MAIN, anchor="mm", role=role)
     top, bottom = yb - face.asc * 0.80 * size, yb + face.desc * 0.55 * size
     if tagline:
         tsize = size * tag_scale
         ty = yb + size * 0.36
+        art.tag = "tagline"
         art.text(tag_text or art.style.tagline, cx, ty, tsize, tracking=TRACK_TAG, anchor="mt", role=tag_role or role, shadow=False)
         bottom = ty + face.cap * tsize * 1.05
     return (cx - w / 2, top, cx + w / 2, bottom), size
@@ -52,7 +54,9 @@ def stacked(art, cx, cy, width, role="ink", second_role=None, ratio=0.27, gap=0.
     g = gap * cap1
     total = cap1 + g + cap2
     top = cy - total / 2
+    art.tag = "word1"
     art.text(b["first_word"], cx, top + cap1, s1, tracking=0.02, anchor="ms", role=role)
+    art.tag = "word2"
     art.text(b["second_word"], cx, top + total, s2, tracking=track, anchor="ms", role=second_role or role, shadow=False)
     return (cx - width / 2, top, cx + width / 2, top + total), s1
 
@@ -67,6 +71,7 @@ def vertical(art, cx, cy, logo_h, role="ink", logo_role=None, gap=0.26, word_rat
     g = gap * logo_h
     total = logo_h + g + words_h
     top = cy - total / 2
+    art.tag = "logo"
     art.logo(cx, top + logo_h / 2, logo_h, role=logo_role or role)
     box, _ = stacked(art, cx, top + logo_h + g + words_h / 2, width, role=role, second_role=second_role)
     return (cx - max(lw, width) / 2, top, cx + max(lw, width) / 2, top + total)
@@ -82,6 +87,7 @@ def horizontal(art, cx, cy, logo_h, role="ink", logo_role=None, gap=0.34, second
         size = logo_h * 0.52
         ww = T.text_width(main, face, size, TRACK_MAIN)
         x0 = cx - (lw + g + ww) / 2
+        art.tag = "logo"
         art.logo(x0 + lw / 2, cy, logo_h, role=logo_role or role)
         y_mid = cy - (size * 0.10 if tagline else 0)
         name_line(art, x0 + lw + g + ww / 2, y_mid, ww, tagline=tagline, role=role, tag_role=second_role, tag_scale=0.24)
@@ -90,6 +96,7 @@ def horizontal(art, cx, cy, logo_h, role="ink", logo_role=None, gap=0.34, second
     s1 = cap_total / (face.cap * (1 + 0.20 + 0.27))
     ww = T.text_width(brand()["first_word"], face, s1, 0.02)
     x0 = cx - (lw + g + ww) / 2
+    art.tag = "logo"
     art.logo(x0 + lw / 2, cy, logo_h, role=logo_role or role)
     stacked(art, x0 + lw + g + ww / 2, cy, ww, role=role, second_role=second_role)
     return (x0, cy - logo_h / 2, x0 + lw + g + ww, cy + logo_h / 2)

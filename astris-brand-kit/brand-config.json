@@ -32,6 +32,14 @@
     "letterboxd": "[LETTERBOXD NAME]"
   },
 
+  "invoice": {
+    "_note": "If you are registered for GST in Australia, change the title to TAX INVOICE and the tax label to GST (10%).",
+    "title": "INVOICE",
+    "tax_label": "GST [IF REGISTERED]",
+    "currency": "AUD",
+    "sign_off": "thank you."
+  },
+
   "films_note": "films.txt is the list the posters are made from. If films.txt is deleted, this list is used instead.",
   "films": ["Two Face", "Charlie", "Ocean (working title)", "The Voice"],
 

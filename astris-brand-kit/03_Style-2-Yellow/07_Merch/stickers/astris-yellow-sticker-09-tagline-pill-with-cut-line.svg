@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="86.02mm" height="28.02mm" viewBox="-43.011 -14.012 86.021 28.025">
+  <title>ASTRIS sticker 09-tagline-pill, Yellow style: 80 x 22 mm, 2 mm bleed</title>
+  <!-- Units are millimetres. Layer 1 is the artwork (300 dpi, with 2 mm of bleed). Layer 2 is the cut line:
+       a vector hairline in magenta. Most print shops call this layer "CutContour"; rename it if yours asks. -->
+  <g id="artwork">
+    <image x="-43.011" y="-14.012" width="86.021" height="28.025" xlink:href="astris-yellow-sticker-09-tagline-pill.png" href="astris-yellow-sticker-09-tagline-pill.png"/>
+  </g>
+  <g id="cut-line" fill="none" stroke="#FF00FF" stroke-width="0.1">
+    <rect x="-40.000" y="-11.000" width="80.000" height="22.000" rx="11.000"/>
+  </g>
+</svg>

@@ -18,6 +18,7 @@ from PIL import Image
 from . import type as T
 from .logo import Logo, raster_polys
 
+cv2.setNumThreads(1)  # OpenCV's own thread pool deadlocks in forked render workers; frames are parallelised instead
 REF = 1440.0          # design reference: a 2560 x 1440 banner is "scale 1"
 
 
@@ -120,7 +121,7 @@ def paper_texture(h, w, s, seed):
         cv2.polylines(lay if k % 3 else lay2, [np.asarray(pts, np.int32)], False, int(r.integers(90, 255)), max(1, int(round(0.9 * s))), cv2.LINE_AA, 4)
     tex -= cv2.GaussianBlur(lay, (0, 0), 0.45 * s).astype(np.float32) / 255.0 * 0.050
     tex += cv2.GaussianBlur(lay2, (0, 0), 0.45 * s).astype(np.float32) / 255.0 * 0.030
-    tex *= 1.0 + 0.012 * soft_noise(h, w, r, 260 * s)
+    tex *= 1.0 + 0.004 * soft_noise(h, w, r, 260 * s)
     return tex
 
 
@@ -139,6 +140,7 @@ class Art:
         self.layers = []                      # (kind, x0, y0, mask, size, opts)
         self.with_grain = grain
         self.logo_obj = style.logo
+        self.tag = "main"                     # layers remember the tag that was current when they were added (for animation)
 
     # ---- adding ink ---------------------------------------------------------------------------------
     def add(self, mask, x0=0, y0=0, role="ink", size=None, colour=None, **opts):
@@ -158,7 +160,7 @@ class Art:
             elif role == "ink" and sch.get("shadow") and opts.pop("shadow", True):
                 # the second ink, printed first and offset down-right, shows as a soft shadow behind the lettering
                 off = max(2.5 * self.s, sch["shadow"] * size) * opts.get("shadow_scale", 1.0)
-                self._push("second", cx0 + off, cy0 + off * 0.9, m, size, dict(opts, colour=None))
+                self._push("second", cx0 + off, cy0 + off * 0.9, m, size, dict(opts, colour=None, tag=self.tag + "~"))
         opts.pop("shadow", None)
         self._push(role, cx0, cy0, m, size, dict(colour=colour, **opts))
         return self
@@ -168,6 +170,7 @@ class Art:
         h, w = m.shape
         cx0, cy0, cx1, cy1 = max(0, x0), max(0, y0), min(self.W, x0 + w), min(self.H, y0 + h)
         if cx1 > cx0 and cy1 > cy0:
+            opts = dict(opts, tag=opts.get("tag") or self.tag)
             self.layers.append((role, cx0, cy0, np.ascontiguousarray(m[cy0 - y0:cy1 - y0, cx0 - x0:cx1 - x0]), size, opts))
 
     def text(self, string, x, y, size, face=None, tracking=0.0, anchor="mm", role="ink", colour=None, **opts):
@@ -182,21 +185,22 @@ class Art:
         self.add(m, x0 + ox, yb + oy, role=role, size=size, colour=colour, **opts)
         return x0, yb, width
 
-    def logo(self, cx, cy, height, role="ink", parts=None, colour=None, size=None, **opts):
+    def logo(self, cx, cy, height, role="ink", parts=None, colour=None, size=None, solid=False, **opts):
+        """solid=True draws the parts without their sprocket holes (so the holes can be punched in later)."""
         lg = self.logo_obj
         wpx = height * lg.aspect
         pad = 6
         x0, y0 = int(math.floor(cx - wpx / 2)) - pad, int(math.floor(cy - height / 2)) - pad
         shape = (int(math.ceil(height)) + 2 * pad + 2, int(math.ceil(wpx)) + 2 * pad + 2)
         ss = 4 if height < 2400 else 2
-        m = lg.mask(shape, cx - wpx / 2 - x0, cy - height / 2 - y0, height, parts, ss=ss)
+        m = lg.mask(shape, cx - wpx / 2 - x0, cy - height / 2 - y0, height, parts, ss=ss, holes=not solid)
         if self.sch["mode"] == "riso" and self.sch.get("shadow") and role == "ink" and opts.get("shadow", True) and not self.sch.get("flood"):
             # print the shadow, then clear it from under the whole silhouette (holes included) so the holes show paper
             sz = size or height * 0.55
             off = max(2.5 * self.s, self.sch["shadow"] * sz) * opts.get("shadow_scale", 1.0)
-            self._push("second", x0 + off, y0 + off * 0.9, m, sz, {"colour": None})
-            solid = lg.mask(shape, cx - wpx / 2 - x0, cy - height / 2 - y0, height, parts, ss=ss, holes=False)
-            self._push("clear_second", x0, y0, solid, sz, {"crisp": True})
+            self._push("second", x0 + off, y0 + off * 0.9, m, sz, {"colour": None, "tag": self.tag + "~"})
+            solid_m = lg.mask(shape, cx - wpx / 2 - x0, cy - height / 2 - y0, height, parts, ss=ss, holes=False)
+            self._push("clear_second", x0, y0, solid_m, sz, {"crisp": True, "tag": self.tag + "~"})
             opts = dict(opts, shadow=False)
         self.add(m, x0, y0, role=role, size=size or height * 0.55, colour=colour, **opts)
         return self

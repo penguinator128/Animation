@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="106.00mm" height="41.99mm" viewBox="-53.001 -20.997 106.003 41.995">
+  <title>ASTRIS sticker 05-rounded-name, Wildcard (Risograph) style: 100 x 36 mm, 2 mm bleed</title>
+  <!-- Units are millimetres. Layer 1 is the artwork (300 dpi, with 2 mm of bleed). Layer 2 is the cut line:
+       a vector hairline in magenta. Most print shops call this layer "CutContour"; rename it if yours asks. -->
+  <g id="artwork">
+    <image x="-53.001" y="-20.997" width="106.003" height="41.995" xlink:href="astris-wildcard-sticker-05-rounded-name.png" href="astris-wildcard-sticker-05-rounded-name.png"/>
+  </g>
+  <g id="cut-line" fill="none" stroke="#FF00FF" stroke-width="0.1">
+    <rect x="-50.000" y="-18.000" width="100.000" height="36.000" rx="6.000"/>
+  </g>
+</svg>

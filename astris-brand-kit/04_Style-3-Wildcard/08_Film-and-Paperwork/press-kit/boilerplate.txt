@@ -1,0 +1,13 @@
+ASTRIS PRODUCTIONS: boilerplate
+================================
+
+[PLACEHOLDER: replace everything between the lines with your own words. Aim for about 50 words that a journalist can paste as-is.]
+
+--------------------------------------------------------------
+ASTRIS PRODUCTIONS is [WHAT YOU ARE: an independent film production company / a filmmaking collective / ...] based in [CITY, STATE]. Founded in [YEAR] by [NAME(S)], it makes [WHAT YOU MAKE]. Recent work includes Two Face, Charlie, Ocean, The Voice.
+--------------------------------------------------------------
+
+Press contact: [YOUR NAME], [EMAIL ADDRESS], [PHONE NUMBER]
+Website: [WEBSITE]
+
+Rules for this text: only facts. No awards, festival selections, quotes or numbers unless they are real and you can point to them.

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="81.03mm" height="54.02mm" viewBox="-40.513 -27.009 81.026 54.017">
+  <title>ASTRIS sticker 12-oval-wordmark, Yellow style: 75 x 48 mm, 2 mm bleed</title>
+  <!-- Units are millimetres. Layer 1 is the artwork (300 dpi, with 2 mm of bleed). Layer 2 is the cut line:
+       a vector hairline in magenta. Most print shops call this layer "CutContour"; rename it if yours asks. -->
+  <g id="artwork">
+    <image x="-40.513" y="-27.009" width="81.026" height="54.017" xlink:href="astris-yellow-sticker-12-oval-wordmark.png" href="astris-yellow-sticker-12-oval-wordmark.png"/>
+  </g>
+  <g id="cut-line" fill="none" stroke="#FF00FF" stroke-width="0.1">
+    <ellipse cx="0" cy="0" rx="37.500" ry="24.000"/>
+  </g>
+</svg>
