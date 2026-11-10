@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1900 1600" width="1900" height="1600">
+  <title>ASTRIS logo, optional small-size mark (no sprocket holes), black</title>
+  <path id="film-strip" fill="#000000" fill-rule="evenodd" d="M0 1600 L600 1600 L1000 800 L700 200 Z"/>
+  <path id="bar" fill="#000000" fill-rule="evenodd" d="M700 0 L1100 0 L1900 1600 L1500 1600 Z"/>
+</svg>

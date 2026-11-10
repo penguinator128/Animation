@@ -1,0 +1,7 @@
+# scratch, caches and test renders made while building the kit
+code/_work/
+__pycache__/
+*.pyc
+node_modules/
+.DS_Store
+Thumbs.db
