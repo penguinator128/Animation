@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astris Prototype Three</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;700&display=swap">
+<style>
+/* Layout concept: a showreel that never stops, a bare menu rail on the left, and every page laid over the reel like a slate. */
+:root {
+  --bg: #0b0a09; --ink: #f2ebdd; --dim: rgba(242, 235, 221, .72); --faint: rgba(242, 235, 221, .42);
+  --y: #f2b705; --k: #141210; --line: rgba(242, 235, 221, .2);
+  --display: "Anton", Impact, "Arial Narrow", sans-serif; --text: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rail: 210px; --ease: cubic-bezier(.2, .8, .2, 1);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--text); font-size: 15px; line-height: 1.55; overflow: hidden; -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.a { font-family: var(--display); font-weight: 400; letter-spacing: .012em; }
+.cap { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; font-weight: 500; }
+:focus-visible { outline: 3px solid var(--y); outline-offset: 3px; }
+
+/* ---- the reel: always playing, silent, on loop ---- */
+#reel { position: fixed; inset: 0; z-index: 0; background: #050504; overflow: hidden; }
+#reel video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 1s; }
+#reel.has-video video { opacity: 1; }
+#reel.has-video .slides { opacity: 0; }
+.slides { position: absolute; inset: 0; transition: opacity 1s; }
+.slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.6s ease; transform: scale(1.02); }
+.slide.on { opacity: 1; animation: drift 14s linear forwards; }
+@keyframes drift { from { transform: scale(1.02) translate3d(0, 0, 0); } to { transform: scale(1.16) translate3d(-1.5%, -1%, 0); } }
+#scrim { position: absolute; inset: 0; background:
+  linear-gradient(90deg, rgba(11, 10, 9, .82) 0, rgba(11, 10, 9, .5) 38%, rgba(11, 10, 9, .12) 70%, rgba(11, 10, 9, .3)),
+  linear-gradient(0deg, rgba(11, 10, 9, .85) 0, rgba(11, 10, 9, 0) 42%),
+  linear-gradient(180deg, rgba(11, 10, 9, .5) 0, rgba(11, 10, 9, 0) 20%); }
+
+/* ---- the menu rail ---- */
+#rail { position: fixed; z-index: 30; left: 0; top: 0; bottom: 0; width: var(--rail); padding: 30px 0 30px 34px; display: flex; flex-direction: column; justify-content: space-between; }
+.logo-link { display: flex; align-items: center; gap: 12px; color: var(--y); width: max-content; }
+.logo-link b { font-family: var(--display); font-weight: 400; font-size: 25px; letter-spacing: .04em; color: var(--ink); }
+.logo { display: block; height: 30px; width: auto; }
+#nav { display: flex; flex-direction: column; gap: 4px; }
+#nav a { font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; font-weight: 500; padding: 9px 0; color: var(--dim); display: flex; align-items: center; gap: 10px; transition: color .25s, transform .35s var(--ease); text-shadow: 0 1px 12px rgba(0, 0, 0, .7); }
+#nav a::before { content: ""; width: 0; height: 2px; background: var(--y); transition: width .35s var(--ease); }
+#nav a:hover { color: var(--ink); transform: translateX(4px); }
+#nav a[aria-current="page"] { color: var(--y); }
+#nav a[aria-current="page"]::before, #nav a:hover::before { width: 22px; }
+.rail-foot { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); line-height: 1.9; }
+#burger { display: none; }
+
+/* ---- the page layer ---- */
+#view { position: fixed; inset: 0; z-index: 10; overflow-y: auto; overflow-x: hidden; padding: 0; scrollbar-width: thin; scrollbar-color: var(--y) transparent; }
+body:not([data-page="home"]) #view { background: linear-gradient(90deg, rgba(11, 10, 9, .93) 0, rgba(11, 10, 9, .86) 45%, rgba(11, 10, 9, .8)); backdrop-filter: blur(18px) saturate(.8); }
+body[data-page="home"] #view { padding: 0; }
+.rise { animation: rise .8s var(--ease) both; animation-delay: var(--d, 0ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+
+/* ---- transition: a slanted strip of yellow wipes across ---- */
+
+/* ---- home: a quiet first screen over the reel, then more as you scroll ---- */
+.hs { position: relative; height: 100vh; min-height: 560px; }
+@keyframes blink { 50% { opacity: .15; } }
+body[data-page="home"] .rail-foot { opacity: 0; pointer-events: none; }
+.blk { position: relative; padding: 100px 56px 100px calc(var(--rail) + 40px); background: rgba(11, 10, 9, .8); backdrop-filter: blur(14px) saturate(.8); }
+.blk.first { background: linear-gradient(180deg, rgba(11, 10, 9, 0) 0, rgba(11, 10, 9, .82) 200px); backdrop-filter: none; padding-top: 140px; }
+.blk h2 { font-size: clamp(44px, 5.4vw, 86px); line-height: .95; margin-bottom: 8px; } .blk h2 i { color: var(--y); font-style: normal; } .blk .lead { color: var(--dim); max-width: 520px; margin-bottom: 34px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.card { display: block; transition: transform .4s var(--ease); } .card:hover { transform: translateY(-8px); }
+.card .im { aspect-ratio: 4 / 5; background-size: cover; background-position: center; border: 3px solid #000; position: relative; transition: outline-offset .3s; outline: 0 solid var(--y); } .card:hover .im { outline: 4px solid var(--y); outline-offset: 4px; }
+.card .im span { position: absolute; left: 0; top: 0; background: var(--y); color: var(--k); font-size: 10.5px; letter-spacing: .18em; font-weight: 700; text-transform: uppercase; padding: 5px 12px; }
+.card b { display: block; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1; margin-top: 12px; } .card small { color: var(--dim); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.bio { display: grid; grid-template-columns: 340px 1fr; gap: 56px; align-items: center; }
+.bio .me { width: 340px; justify-self: start; animation: none; }
+.bio p { color: var(--dim); max-width: 560px; margin-bottom: 14px; font-size: 16px; }
+/* ---- the opening: the A's film strip scrolls the latest work ---- */
+/* ---- tabs, studio ---- */
+.tabs { display: flex; gap: 8px; margin: -4px 0 26px; flex-wrap: wrap; } .tab { font-family: var(--display); font-size: 30px; letter-spacing: .02em; padding: 6px 22px 8px 0; margin-right: 16px; color: var(--faint); border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; } .tab:hover { color: var(--ink); } .tab[aria-pressed="true"] { color: var(--y); border-color: var(--y); }
+.drop { display: grid; place-items: center; text-align: center; gap: 6px; min-height: 150px; border: 3px dashed rgba(242, 183, 5, .7); background: rgba(242, 183, 5, .05); cursor: pointer; color: var(--dim); transition: background .25s; } .drop:hover { background: rgba(242, 183, 5, .12); } .drop b { font-size: 36px; color: var(--y); font-weight: 400; }
+.sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; } .sc { border: 1px solid var(--line); background: rgba(20, 18, 16, .7); } .sc .im { aspect-ratio: 4 / 3; background-size: cover; background-position: center; } .sc .bd { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; } .sc b { font-family: var(--display); font-weight: 400; font-size: 24px; line-height: 1; } .sc small { color: var(--dim); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.sw { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); } .sw i { width: 42px; height: 24px; border-radius: 14px; background: rgba(242, 235, 221, .2); position: relative; transition: background .25s; flex: none; } .sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .3s var(--ease), background .25s; } .sw[aria-pressed="true"] { color: var(--y); } .sw[aria-pressed="true"] i { background: var(--y); } .sw[aria-pressed="true"] i::after { transform: translateX(18px); background: var(--k); }
+/* ---- the film-reel wipe between pages ---- */
+/* ---- home: a centred title over the reel, then more as you scroll ---- */
+.hs { position: relative; height: 100vh; min-height: 560px; }
+.hs::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 46% at 50% 50%, rgba(11, 10, 9, .66), transparent 72%); pointer-events: none; }
+.hero { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-56%); text-align: center; padding: 0 24px; }
+.hero h1 { font-size: clamp(76px, 12vw, 200px); line-height: .88; text-shadow: 0 6px 44px rgba(0, 0, 0, .65); }
+.hero .prod { font-size: clamp(18px, 2.4vw, 38px); letter-spacing: .52em; padding-left: .52em; margin-top: 16px; color: var(--y); text-shadow: 0 2px 20px rgba(0, 0, 0, .9); }
+.hero .go { display: flex; justify-content: center; margin-top: 36px; }
+.scue { position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; text-shadow: 0 1px 12px #000; }
+.scue::after { content: ""; width: 1px; height: 40px; background: var(--y); transform-origin: top; animation: cue 1.8s ease-in-out infinite; }
+@keyframes cue { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; border-radius: 40px; font-weight: 700; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; transition: transform .3s var(--ease), background .25s, color .25s; }
+.btn.y { background: var(--y); color: var(--k); } .btn.o { border: 2px solid var(--ink); } .btn.y:hover, .btn.o:hover { transform: translateY(-3px); } .btn.o:hover { background: var(--ink); color: var(--k); }
+/* ---- the footer: on every page, with the film reel at the very bottom ---- */
+.pg { padding: 56px 56px 90px calc(var(--rail) + 40px); min-height: calc(100vh - 380px); }
+.foot { position: relative; background: rgba(8, 7, 6, .95); border-top: 1px solid var(--line); }
+.fcols { display: grid; grid-template-columns: 1.3fr 1fr 1fr 1.2fr; gap: 36px; padding: 56px 56px 44px calc(var(--rail) + 40px); }
+.foot h4 { font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--y); margin-bottom: 14px; font-weight: 700; }
+.foot a, .foot button, .foot p { display: block; font-size: 14px; color: var(--dim); padding: 3px 0; text-align: left; transition: color .2s; } .foot a:hover, .foot button:hover { color: var(--y); }
+.foot .big { font-family: var(--display); font-size: 34px; letter-spacing: .04em; color: var(--ink); line-height: 1.1; } .foot .logo-link { display: flex; color: var(--y); margin-bottom: 14px; }
+.fbase { display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; padding: 16px 56px 16px calc(var(--rail) + 40px); border-top: 1px solid var(--line); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.ribbon { position: relative; height: 150px; background: #070605; border-top: 1px solid var(--line); }
+.ribbon::before, .ribbon::after { content: ""; position: absolute; left: 0; right: 0; height: 11px; background: repeating-linear-gradient(90deg, rgba(242, 235, 221, .26) 0 16px, transparent 16px 34px); z-index: 2; pointer-events: none; } .ribbon::before { top: 8px; } .ribbon::after { bottom: 8px; }
+.fr { position: relative; flex: none; width: 200px; height: 84px; background-size: cover; background-position: center; border: 2px solid #000; filter: saturate(.85); transition: filter .3s, transform .3s var(--ease); user-select: none; -webkit-user-drag: none; }
+.fr:hover { filter: none; transform: translateY(-3px) scale(1.04); outline: 2px solid var(--y); }
+.fr span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; text-align: center; background: linear-gradient(0deg, rgba(0, 0, 0, .85), transparent); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 500; }
+/* ---- news post ---- */
+.np h1 { font-size: clamp(48px, 7vw, 112px); line-height: .95; margin: 12px 0 26px; } .np .hi { height: min(50vh, 520px); background-size: cover; background-position: center; border: 3px solid #000; margin-bottom: 34px; }
+.np .tx { max-width: 680px; display: grid; gap: 18px; color: var(--dim); font-size: 17px; line-height: 1.7; } .ng { columns: 3 240px; column-gap: 14px; margin-top: 44px; } .ng img { margin-bottom: 14px; width: 100%; cursor: zoom-in; transition: filter .3s; } .ng img:hover { filter: brightness(.75); }
+.wip .im span.dn { background: var(--ink); } a.wip { color: inherit; }
+/* ---- film grain over everything (a little stronger on the home screen) ---- */
+#grain { position: fixed; inset: -60px; z-index: 200; pointer-events: none; opacity: .17; mix-blend-mode: overlay; animation: grain .7s steps(7) infinite;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 1.5 -.2'/></filter><rect width='260' height='260' filter='url(%23n)'/></svg>"); }
+body[data-page="home"] #grain { opacity: .24; }
+@keyframes grain { 0% { transform: translate(0, 0); } 14% { transform: translate(-31px, 17px); } 28% { transform: translate(24px, -42px); } 42% { transform: translate(-48px, -12px); } 57% { transform: translate(37px, 29px); } 71% { transform: translate(-14px, 46px); } 85% { transform: translate(44px, -27px); } 100% { transform: translate(0, 0); } }
+/* ---- the footer reel: constantly rolling ---- */
+.rs { height: 100%; overflow: hidden; }
+.track { display: flex; gap: 12px; width: max-content; padding: 33px 0; animation: roll 90s linear infinite; }
+.ribbon:hover .track { animation-play-state: paused; }
+@keyframes roll { to { transform: translateX(-50%); } }
+/* ---- page transitions (five, taking turns) ---- */
+#tr { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+#tr .rl { position: absolute; top: -12%; bottom: -12%; width: 40%; background: #100e0c; transform: skewX(-26.565deg); border-inline: 4px solid var(--y); overflow: hidden; }
+#tr .rl::before, #tr .rl::after { content: ""; position: absolute; top: 0; bottom: 0; width: 38px; z-index: 2; background: repeating-linear-gradient(180deg, #050403 0 24px, #2c2924 24px 60px); animation: spr .5s linear infinite; }
+#tr .rl::before { left: 12px; } #tr .rl::after { right: 12px; }
+@keyframes spr { to { background-position-y: 60px; } }
+#tr .rin { position: absolute; left: 70px; right: 70px; top: 0; animation: rup .9s linear infinite; }
+@keyframes rup { to { transform: translateY(-50%); } }
+#tr .rin i { display: block; height: 240px; margin: 16px 0; background-size: cover; background-position: center; border: 3px solid #000; }
+#tr.reel .rl { left: -60%; animation: swl .9s cubic-bezier(.7, 0, .3, 1) both; } @keyframes swl { to { left: 140%; } }
+#tr.back .rl { left: 140%; animation: swr .9s cubic-bezier(.7, 0, .3, 1) both; } @keyframes swr { to { left: -60%; } }
+#tr .bar2 { position: absolute; top: -10%; bottom: -10%; width: 19%; background: var(--y); transform: skewX(-26.565deg) translateX(-130%); animation: bars .95s cubic-bezier(.65, 0, .35, 1) both; border-right: 5px solid var(--k); }
+@keyframes bars { 0% { transform: skewX(-26.565deg) translateX(-130%); } 45%, 55% { transform: skewX(-26.565deg) translateX(0); } 100% { transform: skewX(-26.565deg) translateX(130%); } }
+#tr .cl { position: absolute; left: -5%; right: -5%; height: 51%; background: repeating-linear-gradient(-26.565deg, #111 0 70px, var(--y) 70px 140px); border: 6px solid #000; }
+#tr .cl.t { top: 0; transform: translateY(-105%); animation: clt .95s cubic-bezier(.6, 0, .2, 1) both; border-top: 0; } #tr .cl.b { bottom: 0; transform: translateY(105%); animation: clb .95s cubic-bezier(.6, 0, .2, 1) both; border-bottom: 0; }
+@keyframes clt { 0% { transform: translateY(-105%); } 34%, 52% { transform: none; } 100% { transform: translateY(-105%); } } @keyframes clb { 0% { transform: translateY(105%); } 34%, 52% { transform: none; } 100% { transform: translateY(105%); } }
+@property --r { syntax: "<length>"; inherits: false; initial-value: 150vmax; }
+#tr .iris { position: absolute; inset: 0; background: var(--y); -webkit-mask: radial-gradient(circle at 50% 50%, transparent var(--r), #000 calc(var(--r) + 1px)); mask: radial-gradient(circle at 50% 50%, transparent var(--r), #000 calc(var(--r) + 1px)); animation: iris 1s cubic-bezier(.6, 0, .4, 1) both; }
+@keyframes iris { 0% { --r: 150vmax; } 45%, 55% { --r: 0px; } 100% { --r: 150vmax; } }
+/* ---- the opening: the bar slams down the A, light bursts, the strip rips past, the camera zooms in ---- */
+#intro { position: fixed; inset: 0; z-index: 120; background: var(--bg); display: grid; place-items: center; transition: opacity .45s ease; overflow: hidden; }
+#intro.out { opacity: 0; pointer-events: none; }
+#isvg { height: min(46vh, 420px); width: auto; overflow: visible; will-change: transform; animation: pulse .5s ease-out .45s; }
+@keyframes pulse { 0% { transform: scale(1); } 30% { transform: scale(1.05); } 100% { transform: scale(1); } }
+#ibar { animation: slam .45s cubic-bezier(.55, 0, .95, .45) both; } @keyframes slam { from { transform: translate(-520px, -1040px); opacity: 0; } 12% { opacity: 1; } to { transform: none; opacity: 1; } }
+#istrip { opacity: 0; animation: sfade .12s linear .45s forwards; } @keyframes sfade { to { opacity: 1; } }
+#ibloom, #irays { transform-box: fill-box; transform-origin: center; opacity: 0; }
+#ibloom { animation: bloom 1s ease-out .45s both; } @keyframes bloom { 0% { opacity: 0; transform: scale(.08); } 12% { opacity: 1; } 100% { opacity: 0; transform: scale(1.3); } }
+#irays { animation: irays 1.1s ease-out .45s both; } @keyframes irays { 0% { opacity: 0; transform: scale(.2) rotate(0); } 14% { opacity: .95; } 100% { opacity: 0; transform: scale(1) rotate(14deg); } }
+#iflash { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(255, 240, 190, .5), transparent 62%); opacity: 0; animation: flash .55s ease-out .45s both; pointer-events: none; } @keyframes flash { 0% { opacity: 0; } 10% { opacity: 1; } 100% { opacity: 0; } }
+.skip { position: absolute; right: 26px; bottom: 22px; z-index: 3; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); } .skip:hover { color: var(--y); }
+body.arrive #view, body.arrive #rail { animation: arrive 1.1s var(--ease) both; } @keyframes arrive { from { transform: scale(1.25); opacity: 0; } to { transform: none; opacity: 1; } }
+/* ---- page furniture ---- */
+.ph { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: flex-end; }
+.ph h1 { font-size: clamp(64px, 9vw, 150px); line-height: .92; }
+.ph h1 i { color: var(--y); font-style: normal; }
+.ph p { max-width: 460px; color: var(--dim); padding-bottom: 12px; }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 26px; align-items: center; margin-bottom: 30px; padding: 14px 0; border-block: 1px solid var(--line); }
+.bar .grp { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bar label, .bar .lab { font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--faint); margin-right: 6px; }
+.chip { padding: 9px 18px; border: 1px solid var(--line); border-radius: 30px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; transition: background .25s, color .25s, border-color .25s, transform .3s var(--ease); }
+.chip:hover { border-color: var(--ink); transform: translateY(-2px); }
+.chip[aria-pressed="true"] { background: var(--y); color: var(--k); border-color: var(--y); font-weight: 700; }
+select { appearance: none; background: rgba(242, 235, 221, .08) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%23f2b705' stroke-width='2'/></svg>") no-repeat right 14px center; color: var(--ink); border: 1px solid var(--line); border-radius: 30px; padding: 9px 38px 9px 18px; font: 500 12px var(--text); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+select option { background: #1b1916; color: var(--ink); }
+.count { margin-left: auto; font-size: 12px; letter-spacing: .18em; color: var(--faint); text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.note { margin-top: 56px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--faint); max-width: 640px; line-height: 1.9; }
+
+/* ---- films: list ---- */
+.row { display: grid; grid-template-columns: 70px 1fr 150px 90px 110px; align-items: center; gap: 12px; min-height: 96px; padding: 0 18px; border-top: 1px solid var(--line); transition: background .3s, color .3s, padding .4s var(--ease); }
+.row:last-child { border-bottom: 1px solid var(--line); }
+.row .n { font-size: 12px; letter-spacing: .2em; color: var(--y); font-variant-numeric: tabular-nums; }
+.row .t { font-size: clamp(34px, 4.6vw, 70px); line-height: 1; }
+.row .m { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+.row:hover { background: var(--y); color: var(--k); padding-left: 34px; } .row:hover .n, .row:hover .m { color: var(--k); }
+#float { position: fixed; z-index: 40; width: 230px; height: 150px; background-size: cover; background-position: center; border: 4px solid var(--y); pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.85) rotate(-3deg); transition: opacity .2s, transform .25s var(--ease); left: 0; top: 0; }
+#float.on { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(2deg); }
+/* ---- films: strip ---- */
+.strip { position: relative; display: flex; gap: 0; overflow-x: auto; padding: 56px 40px; margin-inline: -56px 0; background: #14120f; transform: rotate(-1.4deg); scrollbar-width: none; border-block: 1px solid var(--line); }
+.strip::-webkit-scrollbar { display: none; }
+.strip::before, .strip::after { content: ""; position: absolute; left: 0; width: 100%; min-width: max-content; height: 22px; background: repeating-linear-gradient(90deg, #0b0a09 0 22px, transparent 22px 50px); }
+.strip::before { top: 16px; } .strip::after { bottom: 16px; }
+.frame { position: relative; flex: none; width: 290px; margin-inline: 14px; transition: transform .4s var(--ease); }
+.frame .im { height: 380px; background-size: cover; background-position: center; border: 3px solid #000; transition: outline-offset .3s; outline: 0 solid var(--y); }
+.frame:hover { transform: translateY(-8px); } .frame:hover .im { outline: 4px solid var(--y); outline-offset: 4px; }
+.frame b { position: absolute; left: 0; top: 0; background: #000; color: var(--y); font-size: 12px; letter-spacing: .14em; padding: 6px 10px; }
+.frame .a { display: block; font-size: 34px; margin-top: 14px; line-height: 1; } .frame small { color: var(--dim); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+/* ---- film page ---- */
+.back { display: inline-block; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-bottom: 24px; transition: color .2s, transform .3s var(--ease); } .back:hover { color: var(--y); transform: translateX(-4px); }
+.stage { position: relative; height: min(52vh, 560px); background: #000; overflow: hidden; border: 3px solid #000; }
+.stage .im { position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity .5s, transform 6s linear; } .stage .im.old { opacity: 0; }
+.stage .grad { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(0, 0, 0, .7), transparent 45%); }
+.stage .play { position: absolute; left: 24px; bottom: 22px; display: flex; align-items: center; gap: 14px; font-size: 13px; letter-spacing: .18em; text-transform: uppercase; font-weight: 700; }
+.stage .play i { width: 58px; height: 58px; border-radius: 50%; border: 2px solid var(--y); display: grid; place-items: center; transition: background .25s; } .stage .play:hover i { background: var(--y); }
+.stage .play i::after { content: ""; border-left: 15px solid var(--y); border-block: 9px solid transparent; margin-left: 4px; transition: border-color .25s; } .stage .play:hover i::after { border-left-color: var(--k); }
+.stage .fc { position: absolute; right: 22px; bottom: 26px; font-size: 12px; letter-spacing: .2em; color: var(--y); font-variant-numeric: tabular-nums; }
+.dstrip { position: relative; display: flex; gap: 12px; overflow-x: auto; padding: 44px 20px; margin-top: 22px; background: #14120f; scrollbar-width: none; }
+.dstrip::-webkit-scrollbar { display: none; }
+.dstrip::before, .dstrip::after { content: ""; position: absolute; left: 0; width: 100%; min-width: max-content; height: 16px; background: repeating-linear-gradient(90deg, #0b0a09 0 16px, transparent 16px 38px); } .dstrip::before { top: 12px; } .dstrip::after { bottom: 12px; }
+.dstrip button { flex: none; width: 190px; height: 110px; background-size: cover; background-position: center; border: 3px solid #000; opacity: .6; transition: opacity .3s, transform .3s var(--ease); }
+.dstrip button:hover { opacity: 1; transform: translateY(-4px); } .dstrip button[aria-current="true"] { opacity: 1; outline: 4px solid var(--y); outline-offset: 3px; }
+.fd { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; margin-top: 36px; align-items: start; }
+.fd h1 { font-size: clamp(60px, 8vw, 130px); line-height: .92; color: var(--y); }
+.facts { display: grid; grid-template-columns: 110px 1fr; gap: 10px 14px; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; } .facts b { color: var(--y); font-weight: 500; }
+.pn { display: flex; justify-content: space-between; gap: 16px; margin-top: 44px; padding-top: 22px; border-top: 1px solid var(--line); flex-wrap: wrap; } .pn a { font-family: var(--display); font-size: 34px; transition: color .2s; } .pn a:hover { color: var(--y); }
+/* ---- photography ---- */
+.wall { columns: 4 230px; column-gap: 14px; }
+.ph1 { position: relative; break-inside: avoid; margin-bottom: 14px; overflow: hidden; cursor: zoom-in; background: #000; }
+.ph1 img { width: 100%; transition: transform .8s var(--ease), filter .4s; } .ph1:hover img { transform: scale(1.05); filter: brightness(.7); }
+.ph1 figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 36px 14px 12px; background: linear-gradient(0deg, rgba(0, 0, 0, .85), transparent); transform: translateY(100%); transition: transform .4s var(--ease); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; display: flex; justify-content: space-between; gap: 10px; }
+.ph1:hover figcaption { transform: none; } .tagdl { color: var(--y); font-weight: 700; white-space: nowrap; }
+#lb { position: fixed; inset: 0; z-index: 80; background: rgba(6, 5, 4, .94); display: none; grid-template-columns: 1fr 340px; backdrop-filter: blur(10px); } #lb.on { display: grid; animation: fade .3s both; }
+@keyframes fade { from { opacity: 0; } }
+#lb .pic { position: relative; display: grid; place-items: center; padding: 30px; min-width: 0; } #lb img { max-height: calc(100vh - 80px); width: auto; max-width: 100%; object-fit: contain; }
+#lb aside { padding: 40px 34px; border-left: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; overflow-y: auto; } #lb h2 { font-size: 52px; line-height: 1; color: var(--y); }
+#lb .x { position: absolute; right: 20px; top: 14px; z-index: 3; font-size: 34px; width: 46px; height: 46px; } #lb .nv { position: absolute; top: 50%; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--line); font-size: 22px; background: rgba(0, 0, 0, .4); } #lb .nv:hover { background: var(--y); color: var(--k); } #lb .prev { left: 16px; } #lb .next { right: 16px; }
+/* ---- progress ---- */
+.wips { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 22px; }
+.wip { border: 1px solid var(--line); background: rgba(20, 18, 16, .7); display: flex; flex-direction: column; transition: transform .4s var(--ease), border-color .3s; } .wip:hover { transform: translateY(-6px); border-color: var(--y); }
+.wip .im { height: 200px; background-size: cover; background-position: center; filter: saturate(.8); position: relative; } .wip .im span { position: absolute; left: 0; top: 14px; background: var(--y); color: var(--k); font-size: 11px; letter-spacing: .18em; font-weight: 700; text-transform: uppercase; padding: 6px 14px; }
+.wip .bd { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 14px; } .wip h3 { font-size: 44px; line-height: 1; }
+.steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; } .steps i { display: block; height: 6px; background: rgba(242, 235, 221, .18); position: relative; overflow: hidden; } .steps i.done { background: var(--y); } .steps i.now::after { content: ""; position: absolute; inset: 0; background: var(--y); transform-origin: left; transform: scaleX(var(--p)); animation: grow 1.2s var(--ease) both; }
+@keyframes grow { from { transform: scaleX(0); } }
+.stl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); } .stl .now { color: var(--y); font-weight: 700; }
+.wip .up { font-size: 13px; color: var(--dim); border-top: 1px solid var(--line); padding-top: 12px; } .wip .up b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+/* ---- news ---- */
+.feat { display: grid; grid-template-columns: 1.3fr 1fr; gap: 30px; margin-bottom: 34px; align-items: center; }
+.feat .im { height: 380px; background-size: cover; background-position: center; border: 3px solid #000; transition: transform .6s var(--ease); } .feat:hover .im { transform: scale(1.02); }
+.feat h2 { font-size: clamp(44px, 5.4vw, 86px); line-height: .98; margin: 10px 0 14px; }
+.post { display: grid; grid-template-columns: 130px 1fr 140px; gap: 18px; align-items: center; padding: 22px 12px; border-top: 1px solid var(--line); transition: background .3s, padding .4s var(--ease); } .post:hover { background: rgba(242, 235, 221, .07); padding-left: 28px; }
+.post time { font-size: 12px; letter-spacing: .18em; color: var(--y); text-transform: uppercase; font-variant-numeric: tabular-nums; } .post h3 { font-size: 34px; line-height: 1.05; } .post .tg { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); text-align: right; }
+/* ---- hello ---- */
+.hello { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; }
+.hello h1 { font-size: clamp(110px, 17vw, 290px); line-height: .84; } .hello h1 i { font-style: normal; color: var(--y); }
+.me { width: min(380px, 100%); aspect-ratio: 1; border-radius: 50%; border: 6px solid var(--y); background: url("images/silhouette.jpg") center/cover; justify-self: end; box-shadow: 14px 14px 0 rgba(242, 183, 5, .25); animation: float 7s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-12px) rotate(1.5deg); } }
+.contact { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 36px; margin-top: 50px; padding-top: 26px; border-top: 3px solid var(--y); }
+.contact .big { font-family: var(--display); font-size: clamp(34px, 4vw, 60px); line-height: 1.05; word-break: break-word; } .contact b { display: block; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--y); margin-bottom: 12px; font-weight: 700; } .contact p { color: var(--dim); }
+.copy { margin-top: 16px; }
+/* ---- player + toast + menu ---- */
+#pl { position: fixed; inset: 0; z-index: 85; background: rgba(6, 5, 4, .95); display: none; place-items: center; padding: 30px; } #pl.on { display: grid; animation: fade .3s both; }
+#pl .box { width: min(1100px, 100%); aspect-ratio: 16/9; position: relative; background-size: cover; background-position: center; border: 3px solid var(--y); display: grid; place-items: center; text-align: center; } #pl .box::before { content: ""; position: absolute; inset: 0; background: rgba(0, 0, 0, .6); } #pl .box div { position: relative; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; max-width: 80%; line-height: 2; } #pl .box .a { font-size: clamp(36px, 6vw, 80px); color: var(--y); display: block; line-height: 1; margin-bottom: 12px; }
+#pl .x { position: absolute; right: 22px; top: 16px; font-size: 38px; }
+#toast { position: fixed; z-index: 90; left: 50%; bottom: 34px; transform: translate(-50%, 30px); background: var(--y); color: var(--k); font-weight: 700; font-size: 13px; letter-spacing: .1em; padding: 14px 26px; border-radius: 40px; opacity: 0; pointer-events: none; transition: opacity .3s, transform .4s var(--ease); } #toast.on { opacity: 1; transform: translate(-50%, 0); }
+#mm { display: none; }
+@media (max-width: 900px) {
+  :root { --rail: 0px; }
+  #rail { flex-direction: row; align-items: center; height: 64px; bottom: auto; width: 100%; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); background: linear-gradient(180deg, rgba(11, 10, 9, .85), transparent); }
+  #nav, .rail-foot { display: none; }
+  #burger { display: grid; gap: 6px; width: 40px; padding: 8px; } #burger i { display: block; height: 3px; background: var(--ink); transition: transform .3s; } #burger i:last-child { width: 60%; margin-left: auto; }
+  #mm { display: flex; position: fixed; inset: 0; z-index: 70; background: var(--y); color: var(--k); flex-direction: column; justify-content: center; padding: 80px max(24px, env(safe-area-inset-left, 0px)); gap: 2px; transform: translateY(-100%); transition: transform .6s cubic-bezier(.7, 0, .2, 1); }
+  body.menu #mm { transform: none; } #mm a { font-family: var(--display); font-size: clamp(46px, 13vw, 84px); line-height: 1.06; } #mm .x { position: absolute; right: 20px; top: 14px; font-size: 38px; }
+  .pg { padding: 84px max(16px, env(safe-area-inset-right, 0px)) 70px max(16px, env(safe-area-inset-left, 0px)); min-height: 0; }
+  .hero h1 { font-size: 22vw; } .hero .prod { letter-spacing: .34em; } .ribbon { height: 118px; } .fr { height: 66px; width: 140px; } .track { padding: 26px 16px; } .rb.l { left: 6px; }
+  .fcols { grid-template-columns: 1fr 1fr; gap: 28px; padding: 44px max(16px, env(safe-area-inset-right, 0px)) 34px max(16px, env(safe-area-inset-left, 0px)); } .fbase { padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+  .blk { padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); padding-block: 70px; } .cards { grid-template-columns: repeat(2, 1fr); } .bio { grid-template-columns: 1fr; gap: 28px; } .bio .me { width: 240px; } #intro svg { height: 46vh; }
+  .row { grid-template-columns: 40px 1fr 70px; min-height: 76px; } .row .m:nth-child(3), .row .m:nth-child(5) { display: none; }
+  .strip { margin-inline: -16px 0; padding-inline: 20px; } .frame { width: 220px; } .frame .im { height: 290px; }
+  .fd, .feat, .hello, .contact { grid-template-columns: 1fr; } .me { justify-self: start; width: 260px; } .post { grid-template-columns: 1fr; gap: 6px; } .post .tg { text-align: left; }
+  #lb { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } #lb aside { border-left: 0; border-top: 1px solid var(--line); padding: 20px; } #lb h2 { font-size: 36px; }
+  .wips { grid-template-columns: 1fr; } .count { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } .track { animation: none; } }
+</style>
+
+<div id="reel" aria-hidden="true">
+  <video id="rv" src="showreel.mp4" muted loop playsinline autoplay preload="auto"></video>
+  <div class="slides" id="slides"></div>
+  <div id="scrim"></div>
+</div>
+
+<header id="rail">
+  <a class="logo-link" href="#home" aria-label="Astris home"><svg class="logo" viewBox="0 0 1900 1600" fill="currentColor" fill-rule="evenodd"><path d="M0 1600 L600 1600 L1000 800 L700 200 Z M744.166 375.555 L750.555 362.778 L718.611 298.89 L693.056 350 Z M643.056 450 L694.166 475.555 L719.721 424.445 L668.611 398.89 Z M593.056 550 L644.166 575.555 L669.721 524.445 L618.611 498.89 Z M543.056 650 L594.166 675.555 L619.721 624.445 L568.611 598.89 Z M493.056 750 L544.166 775.555 L569.721 724.445 L518.611 698.89 Z M443.056 850 L494.166 875.555 L519.721 824.445 L468.611 798.89 Z M393.056 950 L444.166 975.555 L469.721 924.445 L418.611 898.89 Z M343.056 1050 L394.166 1075.555 L419.721 1024.445 L368.611 998.89 Z M293.056 1150 L344.166 1175.555 L369.721 1124.445 L318.611 1098.89 Z M243.056 1250 L294.166 1275.555 L319.721 1224.445 L268.611 1198.89 Z M193.056 1350 L244.166 1375.555 L269.721 1324.445 L218.611 1298.89 Z M143.056 1450 L194.166 1475.555 L219.721 1424.445 L168.611 1398.89 Z M169.721 1524.445 L118.611 1498.89 L93.056 1550 L156.944 1550 Z M944.166 775.555 L950.555 762.778 L918.611 698.89 L893.056 750 Z M843.056 850 L894.166 875.555 L919.721 824.445 L868.611 798.89 Z M793.056 950 L844.166 975.555 L869.721 924.445 L818.611 898.89 Z M743.056 1050 L794.166 1075.555 L819.721 1024.445 L768.611 998.89 Z M693.056 1150 L744.166 1175.555 L769.721 1124.445 L718.611 1098.89 Z M643.056 1250 L694.166 1275.555 L719.721 1224.445 L668.611 1198.89 Z M593.056 1350 L644.166 1375.555 L669.721 1324.445 L618.611 1298.89 Z M543.056 1450 L594.166 1475.555 L619.721 1424.445 L568.611 1398.89 Z M569.721 1524.445 L518.611 1498.89 L493.056 1550 L556.944 1550 Z M700 0 L1100 0 L1900 1600 L1500 1600 Z"/></svg><b>ASTRIS</b></a>
+  <nav id="nav" aria-label="Main"></nav>
+  <div class="rail-foot">Film &amp; photography<br>Josh</div>
+  <button id="burger" aria-label="Open menu"><i></i><i></i></button>
+</header>
+<div id="mm"><button class="x" aria-label="Close menu">&#10005;</button></div>
+
+<main id="view"></main>
+<div id="tr"></div>
+<div id="grain"></div>
+<div id="float"></div>
+<div id="lb" role="dialog" aria-label="Photo viewer"></div>
+<div id="pl" role="dialog" aria-label="Film player"></div>
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+  var IMG = function (k) { return "images/ph-" + k + ".jpg"; };
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var bg = function (k) { return "background-image:url('" + IMG(k) + "')"; };
+  var fmtDate = function (d) { var m = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], x = new Date(d + "T00:00:00"); return x.getDate() + " " + m[x.getMonth()] + " " + x.getFullYear(); };
+
+  /* ---------- sample content (titles come from films.txt; dates, types and words in [brackets] are examples) ---------- */
+  var FILMS = [
+    { id: "oceans", title: "Oceans", type: "Documentary", date: "2026-09-01", runtime: 0, wip: true, stage: 3, p: .6, up: ["2026-02-02", "[A SHORT UPDATE: WHAT HAPPENED THIS WEEK]"], stills: ["planet", "tide", "blue", "rain", "shards", "lace"], blurb: "[ONE OR TWO SENTENCES ABOUT THE FILM. THIS ONE IS STILL IN PROGRESS.]" },
+    { id: "new-film-idea", title: "[NEW FILM IDEA]", type: "Short", date: "2026-12-01", runtime: 0, wip: true, stage: 0, p: .5, up: ["2025-12-12", "[A SHORT UPDATE: WHAT HAPPENED THIS WEEK]"], stills: ["mast", "lamp", "house", "shoes", "chain", "flags"], blurb: "[ONE OR TWO SENTENCES ABOUT THE IDEA.]" },
+    { id: "two-face", title: "Two Face", type: "Short", date: "2025-06-14", runtime: 12, stills: ["truck", "house", "lamp", "cyclist", "shoes", "mast"], blurb: "[ONE OR TWO SENTENCES ABOUT THE FILM. WRITE IT ONCE HERE AND IT SHOWS ON THE FILM PAGE.]" },
+    { id: "charlie", title: "Charlie", type: "Short", date: "2025-03-02", runtime: 9, stills: ["cyclist", "bird", "magpie", "chain", "flags", "truck"], blurb: "[ONE OR TWO SENTENCES ABOUT THE FILM.]" },
+    { id: "the-right-way-round", title: "The Right Way Round", type: "Experimental", date: "2024-11-20", runtime: 6, stills: ["oil1", "oil2", "pastel", "stone", "cream", "magenta"], blurb: "[ONE OR TWO SENTENCES ABOUT THE FILM.]" },
+    { id: "the-little-things", title: "The little things", type: "Documentary", date: "2024-05-08", runtime: 18, stills: ["dew", "bands", "lace", "shoes", "lamp", "house"], blurb: "[ONE OR TWO SENTENCES ABOUT THE FILM.]" }
+  ];
+  var PHOTOS = [
+    ["house", "Brick hall", "Black & white", "Suburbs", "2025-04-02", 1], ["magpie", "Magpie in the gum", "Black & white", "Birds", "2025-03-18", 1], ["flags", "Three flags", "Black & white", "Suburbs", "2025-02-11", 0],
+    ["mast", "Mast and stars", "Black & white", "Night", "2025-01-22", 1], ["lamp", "Lamp and hedge", "Black & white", "Night", "2025-01-09", 1], ["truck", "Road closed", "Black & white", "Night", "2024-12-14", 0],
+    ["chain", "Chain swing", "Black & white", "Suburbs", "2024-11-30", 1], ["bird", "Take-off", "Black & white", "Birds", "2024-11-02", 0], ["cyclist", "Morning ride", "Black & white", "Suburbs", "2024-10-19", 1], ["shoes", "Puddle", "Black & white", "Suburbs", "2024-10-01", 0],
+    ["planet", "Soap planet", "Macro", "Soap film", "2026-01-12", 1], ["bands", "Soap bands", "Macro", "Soap film", "2026-01-05", 1], ["tide", "Red tide", "Macro", "Soap film", "2025-12-21", 0], ["lace", "Soap lace", "Macro", "Soap film", "2025-12-08", 1],
+    ["shards", "Shards", "Macro", "Soap film", "2025-11-26", 0], ["film9", "Soap film IX", "Macro", "Soap film", "2025-11-10", 1], ["film10", "Soap film X", "Macro", "Soap film", "2025-10-29", 0],
+    ["oil1", "Oil and water I", "Macro", "Oil and water", "2025-10-14", 1], ["oil2", "Oil and water II", "Macro", "Oil and water", "2025-10-03", 1], ["pastel", "Pastel orbs", "Macro", "Oil and water", "2025-09-20", 0],
+    ["blue", "Blue orbit", "Macro", "Oil and water", "2025-09-02", 1], ["dew", "Pink dew", "Macro", "Dew", "2025-08-15", 1], ["rain", "Rainbow dew", "Macro", "Dew", "2025-08-01", 0], ["magenta", "Magenta edge", "Macro", "Light and glass", "2025-07-12", 1],
+    ["cream", "Cream and magenta", "Macro", "Light and glass", "2025-07-01", 0], ["stone", "Violet stone", "Macro", "Light and glass", "2025-06-10", 1]
+  ].map(function (p, i) { return { id: i, k: p[0], title: p[1], coll: p[2], project: p[3], date: p[4], dl: !!p[5] }; });
+  var FEAT = { films: ["two-face", "charlie", "the-little-things"], photos: ["planet", "house", "bands", "cyclist", "lamp", "oil1"] };
+  FILMS.forEach(function (f) { f.feat = FEAT.films.indexOf(f.id) > -1; }); PHOTOS.forEach(function (p) { p.feat = FEAT.photos.indexOf(p.k) > -1; });
+  var bgu = function (u) { return "background-image:url('" + u + "')"; };
+  /* what shows on the intro, the homepage reel and "latest": everything switched on as featured in the Studio */
+  function featured() {
+    var l = [];
+    FILMS.forEach(function (f) { if (f.feat) l.push({ type: "Film", title: f.title, u: IMG(f.stills[0]), d: f.date, href: "#film-" + f.id }); });
+    PHOTOS.forEach(function (p) { if (p.feat) l.push({ type: "Photo", title: p.title, u: p.src || IMG(p.k), d: p.date, href: "#photography" }); });
+    return l.sort(function (a, b) { return b.d.localeCompare(a.d); });
+  }
+  var STAGES = ["Idea", "Writing", "Shooting", "Editing", "Finishing"];
+  var NEWS = [
+    { id: 1, d: "2026-02-10", t: "[NEWS HEADLINE ONE]", tag: "Films", k: "planet", photos: ["planet", "tide", "blue"] }, { id: 2, d: "2026-01-28", t: "[NEWS HEADLINE TWO]", tag: "Photography", k: "bands", photos: ["bands", "lace", "shards", "rain"] },
+    { id: 3, d: "2026-01-04", t: "[NEWS HEADLINE THREE]", tag: "Behind the scenes", k: "truck", photos: ["truck", "house", "lamp"] }, { id: 4, d: "2025-12-15", t: "[NEWS HEADLINE FOUR]", tag: "Studio", k: "blue", photos: ["blue", "pastel"] },
+    { id: 5, d: "2025-11-20", t: "[NEWS HEADLINE FIVE]", tag: "Films", k: "cyclist", photos: ["cyclist", "bird", "magpie"] }, { id: 6, d: "2025-10-30", t: "[NEWS HEADLINE SIX]", tag: "Photography", k: "oil1", photos: ["oil1", "oil2", "stone"] }
+  ];
+  var NAV = [["home", "Home"], ["films", "Films"], ["photography", "Photography"], ["news", "News"], ["hello", "Say hello"]];
+  var SAMPLE = '<p class="note">Sample details. Film titles come from your films.txt. Dates, types, project names and anything in [brackets] are examples to show how the page works. Photo titles are placeholders.</p>';
+
+  /* ---------- menu ---------- */
+  var navHtml = NAV.map(function (n) { return '<a href="#' + n[0] + '" data-r="' + n[0] + '">' + n[1] + "</a>"; }).join("");
+  $("#nav").innerHTML = navHtml;
+  $("#mm").insertAdjacentHTML("beforeend", navHtml);
+  $("#burger").onclick = function () { document.body.classList.add("menu"); };
+  $("#mm").onclick = function (e) { if (e.target.closest("a, .x")) document.body.classList.remove("menu"); };
+
+  /* ---------- the reel: your video if showreel.mp4 is there, otherwise a slow slideshow of stills ---------- */
+  var reel = $("#reel"), rv = $("#rv"), SL = ["planet", "tide", "shards", "blue", "bands", "rain"];
+  $("#slides").innerHTML = SL.map(function (k, i) { return '<div class="slide' + (i ? "" : " on") + '" style="' + bg(k) + '"></div>'; }).join("");
+  var si = 0, slides = $$(".slide");
+  setInterval(function () { slides[si].classList.remove("on"); si = (si + 1) % slides.length; var s = slides[si]; s.style.animation = "none"; void s.offsetWidth; s.style.animation = ""; s.classList.add("on"); }, 7000);
+  rv.addEventListener("loadeddata", function () { reel.classList.add("has-video"); var p = rv.play(); if (p && p.catch) p.catch(function () {}); });
+  rv.addEventListener("error", function () { reel.classList.remove("has-video"); });
+  var t0 = Date.now();
+  var homeScroll = function () { document.body.classList.toggle('scrolled', this.scrollTop > 120); };
+
+  /* ---------- toast, float preview ---------- */
+  var tt; function toast(m) { var t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("on"); }, 2200); }
+  var fl = $("#float");
+  document.addEventListener("mousemove", function (e) { fl.style.left = e.clientX + 150 + "px"; fl.style.top = e.clientY + "px"; });
+  function bindRows() {
+    $$(".row").forEach(function (r) {
+      r.addEventListener("mouseenter", function () { fl.style.backgroundImage = "url('" + IMG(r.dataset.k) + "')"; fl.classList.add("on"); });
+      r.addEventListener("mouseleave", function () { fl.classList.remove("on"); });
+    });
+  }
+  function sidewaysWheel(el) { el.addEventListener("wheel", function (e) { if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { el.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false }); }
+  var head = function (t, accent, p) { return '<header class="ph rise"><h1 class="a">' + t + "<i>" + accent + "</i></h1><p>" + p + "</p></header>"; };
+  var chips = function (name, list, cur) { return '<div class="grp" data-g="' + name + '">' + list.map(function (c) { return '<button class="chip" data-v="' + c + '" aria-pressed="' + (c === cur) + '">' + c + "</button>"; }).join("") + "</div>"; };
+  var select = function (id, opts, cur) { return '<select id="' + id + '" aria-label="Sort">' + opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + o[1] + "</option>"; }).join("") + "</select>"; };
+  function bindChips(root, st, fn) { $$(".chip", root).forEach(function (b) { b.onclick = function () { var g = b.parentNode.dataset.g; st[g] = b.dataset.v; $$(".chip", b.parentNode).forEach(function (x) { x.setAttribute("aria-pressed", x === b); }); fn(); }; }); }
+
+  /* ---------- pages ---------- */
+  var P = {};
+  P.home = function () {
+    var F = featured();
+    var cards = F.slice(0, 4).map(function (f) { return '<a class="card rise" href="' + f.href + '"><div class="im" style="' + bgu(f.u) + '"><span>' + f.type + "</span></div><b>" + f.title.toUpperCase() + "</b><small>" + fmtDate(f.d) + "</small></a>"; }).join("");
+    var nw = NEWS.slice(0, 3).map(function (n) { return '<a class="post" href="#news-' + n.id + '"><time>' + fmtDate(n.d) + '</time><h3 class="a">' + n.t + '</h3><span class="tg">' + n.tag + "</span></a>"; }).join("");
+    $("#view").innerHTML = '<section class="hs"><div class="hero"><h1 class="a rise">ASTRIS</h1><div class="prod a rise" style="--d:120ms">PRODUCTIONS</div>' +
+      '<div class="go rise" style="--d:260ms"><a class="btn y" href="#films">Watch the films &rarr;</a></div></div><div class="scue rise" style="--d:500ms">Scroll</div></section>' +
+      '<section class="blk first"><h2 class="a">LATEST<i>.</i></h2><p class="lead">The newest films and photos.</p><div class="cards">' + cards + '</div></section>' +
+      '<section class="blk"><div class="bio"><div class="me" role="img" aria-label="Silhouette of a person holding a camera"></div><div><h2 class="a">HI, I\'M JOSH<i>.</i></h2><p>Photographer and filmmaker based in Canberra.</p><p>Photography &middot; Filmmaking &middot; Editing &middot; Colour</p><p>[ONE MORE LINE ABOUT YOU: WHAT YOU MAKE, AND WHY.]</p><a class="btn y" href="#hello">Say hello &rarr;</a></div></div></section>' +
+      '<section class="blk"><h2 class="a">NEWS<i>.</i></h2><p class="lead">What the studio is up to.</p>' + nw + SAMPLE + "</section>";
+  };
+  var fs = { sort: "new", show: "All", type: "All types" };
+  var progressHtml = function (f) {
+    var steps = STAGES.map(function (s, x) { return "<i" + (x < f.stage ? ' class="done"' : x === f.stage ? ' class="now" style="--p:' + f.p + '"' : "") + "></i>"; }).join("");
+    var lab = STAGES.map(function (s, x) { return "<span" + (x === f.stage ? ' class="now"' : "") + ">" + s + "</span>"; }).join("");
+    return '<div><div class="steps">' + steps + '</div><div class="stl" style="margin-top:8px">' + lab + "</div></div>";
+  };
+  P.films = function () {
+    $("#view").innerHTML = head("FILMS", ".", "Finished films and the ones still being made, all in one place. The ones with a bar are in progress.") +
+      '<div class="bar rise" style="--d:100ms"><div class="grp"><span class="lab">Show</span>' + chips("show", ["All", "Finished", "In progress"], fs.show) + '</div><div class="grp"><label for="ftype">Type</label>' + select("ftype", [["All types", "All types"], ["Short", "Short"], ["Documentary", "Documentary"], ["Experimental", "Experimental"]], fs.type) + '</div>' +
+      '<div class="grp"><label for="fsort">Sort</label>' + select("fsort", [["new", "Newest first"], ["old", "Oldest first"], ["az", "A to Z"], ["short", "Shortest first"], ["long", "Longest first"]], fs.sort) + '</div><span class="count" id="fcount"></span></div><div class="wips" id="fout"></div>' + SAMPLE;
+    $("#fsort").onchange = function () { fs.sort = this.value; films(); }; $("#ftype").onchange = function () { fs.type = this.value; films(); };
+    bindChips($("#view"), fs, films);
+    films();
+  };
+  function films() {
+    var l = FILMS.filter(function (f) { return (fs.show === "All" || (fs.show === "In progress" ? f.wip : !f.wip)) && (fs.type === "All types" || f.type === fs.type); });
+    l.sort(function (a, b) { return { new: b.date.localeCompare(a.date), old: a.date.localeCompare(b.date), az: a.title.localeCompare(b.title), short: (a.runtime || 999) - (b.runtime || 999), long: b.runtime - a.runtime }[fs.sort]; });
+    $("#fcount").textContent = l.length + (l.length === 1 ? " film" : " films");
+    if (!l.length) { $("#fout").innerHTML = '<p class="note">Nothing here yet. Try another filter.</p>'; return; }
+    $("#fout").innerHTML = l.map(function (f, i) {
+      return '<a class="wip rise" style="--d:' + i * 80 + 'ms" href="#film-' + f.id + '"><div class="im" style="' + bg(f.stills[0]) + '"><span class="' + (f.wip ? "" : "dn") + '">' + (f.wip ? "In progress" : f.type) + '</span></div><div class="bd"><h3 class="a">' + f.title.toUpperCase() + "</h3>" +
+        (f.wip ? progressHtml(f) + '<p class="up"><b>' + fmtDate(f.up[0]) + "</b> &nbsp; " + f.up[1] + "</p>" : '<p class="up"><b>' + f.runtime + " min</b> &nbsp; " + f.type + " &middot; " + f.date.slice(0, 4) + "</p>") + "</div></a>";
+    }).join("");
+  }
+  var dstate = { f: null, i: 0 };
+  P.film = function (id) {
+    var n = FILMS.map(function (f) { return f.id; }).indexOf(id); if (n < 0) { location.hash = "films"; return; }
+    var f = FILMS[n], pr = FILMS[(n + FILMS.length - 1) % FILMS.length], nx = FILMS[(n + 1) % FILMS.length]; dstate = { f: f, i: 0 };
+    $("#view").innerHTML = '<a class="back rise" href="#films">&larr; All films</a>' +
+      '<div class="stage rise" style="--d:80ms"><div class="im" id="sim" style="' + bg(f.stills[0]) + '"></div><div class="grad"></div><button class="play" id="plbtn"><i></i>' + (f.wip ? "Watch the teaser" : "Play film") + '</button><span class="fc" id="fc"></span></div>' +
+      '<div class="dstrip rise" style="--d:160ms" id="dstrip">' + f.stills.map(function (k, i) { return '<button style="' + bg(k) + '" data-i="' + i + '" aria-label="Frame ' + (i + 1) + '"' + (i ? "" : ' aria-current="true"') + "></button>"; }).join("") + "</div>" +
+      '<div class="fd rise" style="--d:240ms"><div><h1 class="a">' + f.title.toUpperCase() + "</h1><p style='margin:18px 0 22px;color:var(--dim);max-width:520px'>" + f.blurb + "</p>" + (f.wip ? progressHtml(f) : "") + "</div>" +
+      '<div class="facts"><b>Status</b><span>' + (f.wip ? "In progress: " + STAGES[f.stage] : "Finished") + "</span><b>Type</b><span>" + f.type + "</span><b>" + (f.wip ? "Aiming for" : "Date") + "</b><span>" + (f.wip ? fmtDate(f.date) : fmtDate(f.date)) + "</span><b>Runtime</b><span>" + (f.runtime ? f.runtime + " min" : "[RUNTIME]") + "</span><b>Role</b><span>[YOUR ROLE]</span><b>Cast</b><span>[CAST]</span></div></div>" +
+      '<div class="pn"><a href="#film-' + pr.id + '">&larr; ' + pr.title + '</a><a href="#film-' + nx.id + '">' + nx.title + " &rarr;</a></div>" + SAMPLE;
+    sidewaysWheel($("#dstrip")); frame(0);
+    $$("#dstrip button").forEach(function (b) { b.onclick = function () { frame(+b.dataset.i); }; });
+    $("#plbtn").onclick = function () { var p = $("#pl"); p.innerHTML = '<button class="x" aria-label="Close">&#10005;</button><div class="box" style="' + bg(f.stills[dstate.i]) + '"><div><span class="a">' + f.title.toUpperCase() + "</span>[YOUR FILM PLAYS HERE]<br>On the real site this opens the video</div></div>"; p.classList.add("on"); };
+  };
+  function frame(i) { var f = dstate.f, n = f.stills.length; i = (i + n) % n; dstate.i = i; var old = $("#sim"); old.style.backgroundImage = "url('" + IMG(f.stills[i]) + "')"; old.style.transform = "scale(1.04)"; setTimeout(function () { old.style.transform = ""; }, 60); $("#fc").textContent = "FRAME " + pad(i + 1) + " / " + pad(n); $$("#dstrip button").forEach(function (b, x) { b.setAttribute("aria-current", x === i); }); }
+
+  var ps = { coll: "All", sort: "new", proj: "all" }, shown = [], cur = -1;
+  P.photography = function () {
+    var projects = [["all", "All projects"]].concat(PHOTOS.map(function (p) { return p.project; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).map(function (p) { return [p, p]; }));
+    $("#view").innerHTML = head("PHOTOS", ".", "Black and white on the street, and macro work from soap, oil and water. Some are free to download.") +
+      '<div class="bar rise" style="--d:100ms"><div class="grp"><span class="lab">Show</span>' + chips("coll", ["All", "Black & white", "Macro", "Free to download"], ps.coll) + "</div>" +
+      '<div class="grp"><label for="pproj">Project</label>' + select("pproj", projects, ps.proj) + '</div><div class="grp"><label for="psort">Sort</label>' + select("psort", [["new", "Newest first"], ["old", "Oldest first"], ["az", "A to Z"]], ps.sort) + '</div><span class="count" id="pcount"></span></div><div class="wall" id="wall"></div>' + SAMPLE;
+    $("#psort").onchange = function () { ps.sort = this.value; wall(); }; $("#pproj").onchange = function () { ps.proj = this.value; wall(); };
+    bindChips($("#view"), ps, wall); wall();
+  };
+  function wall() {
+    shown = PHOTOS.filter(function (p) { return (ps.coll === "All" || (ps.coll === "Free to download" ? p.dl : p.coll === ps.coll)) && (ps.proj === "all" || p.project === ps.proj); });
+    shown.sort(function (a, b) { return ps.sort === "az" ? a.title.localeCompare(b.title) : ps.sort === "old" ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date); });
+    $("#pcount").textContent = shown.length + " photos";
+    $("#wall").innerHTML = shown.map(function (p, i) { return '<figure class="ph1 rise" style="--d:' + Math.min(i, 14) * 45 + 'ms" data-i="' + i + '"><img src="' + IMG(p.k) + '" alt="' + p.title + '" loading="lazy"><figcaption><span>' + p.title + "</span>" + (p.dl ? '<span class="tagdl">FREE</span>' : "") + "</figcaption></figure>"; }).join("");
+    $$(".ph1").forEach(function (f) { f.onclick = function () { openLb(+f.dataset.i); }; });
+  }
+  function openLb(i) {
+    cur = (i + shown.length) % shown.length; var p = shown[cur], lb = $("#lb");
+    lb.innerHTML = '<div class="pic"><button class="x" aria-label="Close">&#10005;</button><button class="nv prev" aria-label="Previous">&#8592;</button><img src="' + IMG(p.k) + '" alt="' + p.title + '"><button class="nv next" aria-label="Next">&#8594;</button></div>' +
+      '<aside><span class="cap" style="color:var(--y)">' + p.coll + " &middot; " + p.project + '</span><h2 class="a">' + p.title.toUpperCase() + '</h2><p style="color:var(--dim)">' + fmtDate(p.date) + " &middot; " + (cur + 1) + " of " + shown.length + "</p>" +
+      (p.dl ? '<a class="btn y" id="dl" href="' + IMG(p.k) + '" download="astris-' + p.k + '.jpg">Download photo</a><p style="color:var(--dim);font-size:13px">Free to download. A credit is appreciated.</p>' : '<p class="cap" style="color:var(--faint)">Not available to download</p>') + "</aside>";
+    lb.classList.add("on");
+    var d = $("#dl"); if (d) d.onclick = function () { toast("Downloading " + p.title); };
+  }
+  $("#lb").addEventListener("click", function (e) { if (e.target.closest(".x") || e.target === this) this.classList.remove("on"); else if (e.target.closest(".prev")) openLb(cur - 1); else if (e.target.closest(".next")) openLb(cur + 1); });
+  $("#pl").addEventListener("click", function (e) { if (e.target.closest(".x") || e.target === this) this.classList.remove("on"); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { $("#lb").classList.remove("on"); $("#pl").classList.remove("on"); document.body.classList.remove("menu"); }
+    if ($("#lb").classList.contains("on")) { if (e.key === "ArrowRight") openLb(cur + 1); if (e.key === "ArrowLeft") openLb(cur - 1); }
+    else if (dstate.f && /^film-/.test(route()) && !$("#pl").classList.contains("on")) { if (e.key === "ArrowRight") frame(dstate.i + 1); if (e.key === "ArrowLeft") frame(dstate.i - 1); }
+  });
+
+  var ns = { tag: "All", sort: "new" };
+  P.news = function () {
+    $("#view").innerHTML = head("NEWS", ".", "Releases, behind the scenes, and what the studio is up to.") +
+      '<div class="bar rise" style="--d:100ms"><div class="grp"><span class="lab">Topic</span>' + chips("tag", ["All", "Films", "Photography", "Behind the scenes", "Studio"], ns.tag) + '</div><div class="grp"><label for="nsort">Sort</label>' + select("nsort", [["new", "Newest first"], ["old", "Oldest first"]], ns.sort) + '</div><span class="count" id="ncount"></span></div><div id="nout"></div>' + SAMPLE;
+    $("#nsort").onchange = function () { ns.sort = this.value; news(); }; bindChips($("#view"), ns, news); news();
+  };
+  function news() {
+    var l = NEWS.filter(function (n) { return ns.tag === "All" || n.tag === ns.tag; }); l.sort(function (a, b) { return ns.sort === "new" ? b.d.localeCompare(a.d) : a.d.localeCompare(b.d); });
+    $("#ncount").textContent = l.length + " posts"; if (!l.length) { $("#nout").innerHTML = '<p class="note">No posts under this topic yet.</p>'; return; }
+    var f = l[0];
+    $("#nout").innerHTML = '<a class="feat rise" href="#news-' + f.id + '"><div class="im" style="' + bg(f.k) + '"></div><div><span class="cap" style="color:var(--y)">' + f.tag + " &middot; " + fmtDate(f.d) + '</span><h2 class="a">' + f.t + '</h2><p style="color:var(--dim)">[THE FIRST LINES OF THE POST GO HERE, SO PEOPLE KNOW WHAT IT IS ABOUT BEFORE THEY CLICK.]</p><span class="btn o" style="margin-top:18px">Read the post &rarr;</span></div></a>' +
+      l.slice(1).map(function (n, i) { return '<a class="post rise" style="--d:' + i * 70 + 'ms" href="#news-' + n.id + '"><time>' + fmtDate(n.d) + '</time><h3 class="a">' + n.t + '</h3><span class="tg">' + n.tag + "</span></a>"; }).join("");
+  }
+  P.newspost = function (id) {
+    var i = NEWS.map(function (n) { return n.id; }).indexOf(id); if (i < 0) { location.hash = "news"; return; }
+    var n = NEWS[i], pr = NEWS[(i + NEWS.length - 1) % NEWS.length], nx = NEWS[(i + 1) % NEWS.length];
+    $("#view").innerHTML = '<a class="back rise" href="#news">&larr; All news</a><article class="np"><span class="cap rise" style="color:var(--y)">' + n.tag + " &middot; " + fmtDate(n.d) + '</span><h1 class="a rise" style="--d:80ms">' + n.t + '</h1><div class="hi rise" style="--d:140ms;' + bg(n.k) + '"></div>' +
+      '<div class="tx rise" style="--d:200ms"><p>[THE FIRST PARAGRAPH OF YOUR POST. WRITE ABOUT WHAT HAPPENED, WHAT YOU MADE, OR WHAT IS COMING NEXT.]</p><p>[A SECOND PARAGRAPH. POSTS CAN HAVE AS MANY PHOTOS AS YOU LIKE, SHOWN BELOW.]</p></div>' +
+      '<div class="ng rise" style="--d:260ms">' + n.photos.map(function (k, x) { return '<img src="' + IMG(k) + '" data-x="' + x + '" alt="Photo ' + (x + 1) + '" loading="lazy">'; }).join("") + '</div></article>' +
+      '<div class="pn"><a href="#news-' + pr.id + '">&larr; ' + pr.t + '</a><a href="#news-' + nx.id + '">' + nx.t + " &rarr;</a></div>" + SAMPLE;
+    $$(".ng img").forEach(function (im) { im.onclick = function () { shown = n.photos.map(function (k) { return PHOTOS.filter(function (p) { return p.k === k; })[0]; }); openLb(+im.dataset.x); }; });
+  };
+  P.hello = function () {
+    $("#view").innerHTML = '<div class="hello"><h1 class="a rise">SAY<br>HELLO<i>.</i></h1><div class="me rise" style="--d:150ms" role="img" aria-label="Silhouette of a person holding a camera"></div></div>' +
+      '<div class="contact rise" style="--d:250ms"><div><b>Email</b><div class="big" id="em">astris.a.productions@gmail.com</div><button class="btn o copy" id="cp">Copy email</button><p style="margin-top:12px">Replies usually within two days.</p></div><div><b>About</b><p>Photographer and filmmaker based in Canberra.<br>Photography &middot; Filmmaking &middot; Editing &middot; Colour</p></div><div><b>Follow</b><p><a href="https://www.youtube.com/@AstrisProductions128" target="_blank" rel="noopener" style="color:var(--ink)">YouTube<br>@AstrisProductions128</a></p></div></div>' + SAMPLE;
+    $("#cp").onclick = function () { var t = $("#em").textContent, ok = function () { toast("Email copied"); }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { sel(); toast("Press Ctrl+C to copy"); }); else { sel(); toast("Press Ctrl+C to copy"); } function sel() { var r = document.createRange(); r.selectNodeContents($("#em")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } };
+  };
+
+  P.studio = function () {
+    var up = 0;
+    $("#view").innerHTML = head("STUDIO", ".", "A preview of the back end. Upload something and choose whether it is featured on the opening intro, the homepage reel and the latest list.") +
+      '<div class="rise" style="--d:80ms"><label class="drop" for="upf"><b class="a">DROP A PHOTO HERE</b>or click to choose a file</label><input id="upf" type="file" accept="image/*" hidden></div>' +
+      '<div class="bar rise" style="--d:140ms;margin-top:26px"><span class="lab">Featured items: <b id="featn" style="color:var(--y)"></b></span><button class="btn o" id="replay">Replay the intro</button></div><div class="sgrid" id="sgrid"></div>' + SAMPLE;
+    function grid() {
+      var all = FILMS.map(function (f) { return { o: f, t: "Film", u: IMG(f.stills[0]), n: f.title }; }).concat(PHOTOS.map(function (p) { return { o: p, t: "Photo", u: p.src || IMG(p.k), n: p.title }; }));
+      all.sort(function (a, b) { return b.o.date.localeCompare(a.o.date); });
+      $("#featn").textContent = all.filter(function (x) { return x.o.feat; }).length;
+      $("#sgrid").innerHTML = all.map(function (x, i) { return '<div class="sc"><div class="im" style="' + bgu(x.u) + '"></div><div class="bd"><div><b>' + x.n.toUpperCase() + "</b><br><small>" + x.t + " &middot; " + fmtDate(x.o.date) + '</small></div><button class="sw" data-i="' + i + '" aria-pressed="' + !!x.o.feat + '"><i></i>Feature on intro</button></div></div>'; }).join("");
+      $$(".sw", $("#sgrid")).forEach(function (b) { b.onclick = function () { var o = all[+b.dataset.i].o; o.feat = !o.feat; grid(); toast(o.feat ? "Featured. It will scroll through the A." : "Removed from the intro"); }; });
+    }
+    grid();
+    $("#replay").onclick = function () { intro(true); };
+    $("#upf").onchange = function () { var f = this.files && this.files[0]; if (!f) return; PHOTOS.unshift({ id: 900 + up++, k: "upload", src: URL.createObjectURL(f), title: f.name.replace(/\.[^.]+$/, "").slice(0, 28) || "New upload", coll: "Black & white", project: "New", date: "2026-03-01", dl: false, feat: true }); grid(); toast("Uploaded. Featured by default: switch it off if you like."); };
+  };
+
+  /* ---------- the opening: bar slams down the A, a burst of light, the strip rips past (fast to slow), then the camera zooms into the last frame ---------- */
+  function intro(force) {
+    var seen = false; try { seen = sessionStorage.getItem("astris-intro") === "1"; } catch (e) {}
+    if ((seen && !force) || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    try { sessionStorage.setItem("astris-intro", "1"); } catch (e) {}
+    var old = $("#intro"); if (old) old.remove();
+    var F = featured(); if (!F.length) return;
+    var L = 22, STEP = 340, FW = 440, FH = 300, urls = [];
+    for (var i = 0; i < L; i++) urls.push(F[i % F.length].u); urls.push(IMG("planet"));
+    var rays = ""; for (var r = 0; r < 16; r++) { var a = r * Math.PI / 8, w = .045; rays += '<polygon points="950,800 ' + (950 + 1700 * Math.cos(a - w)).toFixed(0) + "," + (800 + 1700 * Math.sin(a - w)).toFixed(0) + " " + (950 + 1700 * Math.cos(a + w)).toFixed(0) + "," + (800 + 1700 * Math.sin(a + w)).toFixed(0) + '" fill="url(#irg)"/>'; }
+    var ov = document.createElement("div"); ov.id = "intro";
+    ov.innerHTML = '<svg id="isvg" viewBox="0 0 1900 1600" role="img" aria-label="Astris"><defs><clipPath id="icl"><path d="M0 1600 L600 1600 L1000 800 L700 200 Z"/></clipPath>' +
+      '<pattern id="isp" patternUnits="userSpaceOnUse" width="28" height="85"><rect x="0" y="14" width="28" height="56" rx="7" fill="#0b0a09"/></pattern>' +
+      '<radialGradient id="irg"><stop offset="0" stop-color="#fff7d6"/><stop offset=".25" stop-color="#ffd54a" stop-opacity=".85"/><stop offset=".6" stop-color="#f2b705" stop-opacity=".25"/><stop offset="1" stop-color="#f2b705" stop-opacity="0"/></radialGradient></defs>' +
+      '<g id="irays">' + rays + '</g><g id="istrip"><g clip-path="url(#icl)"><rect x="-400" y="-400" width="2600" height="2400" fill="#16130f"/><g id="icol">' +
+      '<rect x="-262" y="-1200" width="28" height="' + (L * STEP + 3200) + '" fill="url(#isp)"/><rect x="234" y="-1200" width="28" height="' + (L * STEP + 3200) + '" fill="url(#isp)"/>' +
+      urls.map(function (u, i) { return '<image href="' + u + '" x="' + -FW / 2 + '" y="' + (i * STEP - FH / 2) + '" width="' + FW + '" height="' + FH + '" preserveAspectRatio="xMidYMid slice"/>'; }).join("") +
+      '</g></g><path d="M0 1600 L600 1600 L1000 800 L700 200 Z" fill="none" stroke="#f2b705" stroke-width="14"/></g>' +
+      '<path id="ibar" fill="#f2b705" d="M700 0 L1100 0 L1900 1600 L1500 1600 Z"/><circle id="ibloom" cx="950" cy="800" r="1200" fill="url(#irg)"/></svg><div id="iflash"></div><button class="skip">Skip</button>';
+    document.body.appendChild(ov);
+    var svg = $("#isvg", ov), col = $("#icol", ov), imgs = $$("image", ov), done = false, t0 = performance.now(), zoom = null, arrived = false;
+    var Y0 = 520, Y1 = -170 - L * STEP;
+    function exit(fast) { if (done) return; done = true; if (fast) { ov.style.transitionDuration = ".25s"; } ov.classList.add("out"); if (!arrived) arrive(); setTimeout(function () { ov.remove(); }, 650); }
+    function arrive() { arrived = true; document.body.classList.add("arrive"); setTimeout(function () { document.body.classList.remove("arrive"); }, 1300); }
+    ov.onclick = function () { exit(true); }; document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { exit(true); document.removeEventListener("keydown", k); } });
+    (function tick() {
+      if (done) return; var e = performance.now() - t0;
+      var p = Math.min(1, Math.max(0, (e - 480) / 2400)), s = 1 - Math.pow(1 - p, 4), Y = Y0 + (Y1 - Y0) * s;
+      col.setAttribute("transform", "translate(500 1200) rotate(26.565) translate(0 " + Y.toFixed(1) + ")");
+      col.style.filter = "blur(" + (5 * Math.pow(1 - p, 3)).toFixed(2) + "px)";
+      if (e >= 2900) {
+        if (!zoom) { var sr = svg.getBoundingClientRect(), fr = imgs[L].getBoundingClientRect(), fx = fr.left + fr.width / 2, fy = fr.top + fr.height / 2, k = sr.width / 1900;
+          zoom = { dx: innerWidth / 2 - fx, dy: innerHeight / 2 - fy, K: Math.max(innerWidth / (FW * k), innerHeight / (FH * k)) * 1.1 }; svg.style.animation = "none"; svg.style.transformOrigin = (fx - sr.left) + "px " + (fy - sr.top) + "px"; }
+        var z = Math.min(1, (e - 2900) / 850), q = z * z * (3 - 2 * z);
+        svg.style.transform = "translate(" + (zoom.dx * q).toFixed(1) + "px," + (zoom.dy * q).toFixed(1) + "px) rotate(" + (-26.565 * q).toFixed(2) + "deg) scale(" + (1 + (zoom.K - 1) * q * q).toFixed(3) + ")";
+        if (e >= 3350 && !arrived) arrive(); if (e >= 3500) ov.classList.add("out");
+      }
+      if (e > 4150) { exit(false); return; } requestAnimationFrame(tick);
+    })();
+  }
+
+  /* ---------- the footer (on every page) with the scrolling film reel at the very bottom ---------- */
+  function footerHtml() {
+    var F = featured(), half = F.slice(); while (half.length < 12) half = half.concat(F);
+    var fr = half.map(function (f) { return '<a class="fr" draggable="false" href="' + f.href + '" style="' + bgu(f.u) + '" aria-label="' + f.title + '"><span>' + f.title + "</span></a>"; }).join("");
+    return '<footer class="foot"><div class="fcols"><div><a class="logo-link" href="#home" style="padding:0"><svg class="logo" viewBox="0 0 1900 1600" fill="currentColor" fill-rule="evenodd"><path d="M0 1600 L600 1600 L1000 800 L700 200 Z M744.166 375.555 L750.555 362.778 L718.611 298.89 L693.056 350 Z M643.056 450 L694.166 475.555 L719.721 424.445 L668.611 398.89 Z M593.056 550 L644.166 575.555 L669.721 524.445 L618.611 498.89 Z M543.056 650 L594.166 675.555 L619.721 624.445 L568.611 598.89 Z M493.056 750 L544.166 775.555 L569.721 724.445 L518.611 698.89 Z M443.056 850 L494.166 875.555 L519.721 824.445 L468.611 798.89 Z M393.056 950 L444.166 975.555 L469.721 924.445 L418.611 898.89 Z M343.056 1050 L394.166 1075.555 L419.721 1024.445 L368.611 998.89 Z M293.056 1150 L344.166 1175.555 L369.721 1124.445 L318.611 1098.89 Z M243.056 1250 L294.166 1275.555 L319.721 1224.445 L268.611 1198.89 Z M193.056 1350 L244.166 1375.555 L269.721 1324.445 L218.611 1298.89 Z M143.056 1450 L194.166 1475.555 L219.721 1424.445 L168.611 1398.89 Z M169.721 1524.445 L118.611 1498.89 L93.056 1550 L156.944 1550 Z M944.166 775.555 L950.555 762.778 L918.611 698.89 L893.056 750 Z M843.056 850 L894.166 875.555 L919.721 824.445 L868.611 798.89 Z M793.056 950 L844.166 975.555 L869.721 924.445 L818.611 898.89 Z M743.056 1050 L794.166 1075.555 L819.721 1024.445 L768.611 998.89 Z M693.056 1150 L744.166 1175.555 L769.721 1124.445 L718.611 1098.89 Z M643.056 1250 L694.166 1275.555 L719.721 1224.445 L668.611 1198.89 Z M593.056 1350 L644.166 1375.555 L669.721 1324.445 L618.611 1298.89 Z M543.056 1450 L594.166 1475.555 L619.721 1424.445 L568.611 1398.89 Z M569.721 1524.445 L518.611 1498.89 L493.056 1550 L556.944 1550 Z M700 0 L1100 0 L1900 1600 L1500 1600 Z"/></svg></a><div class="big">ASTRIS<br>PRODUCTIONS</div><p style="margin-top:10px">Film &amp; photography</p></div>' +
+      '<div><h4>Explore</h4><a href="#films">Films</a><a href="#photography">Photography</a><a href="#news">News</a><a href="#hello">Say hello</a></div>' +
+      '<div><h4>Follow</h4><a href="https://www.youtube.com/@AstrisProductions128" target="_blank" rel="noopener">YouTube<br>@AstrisProductions128</a></div>' +
+      '<div><h4>Contact</h4><a href="#hello">astris.a.productions@gmail.com</a><p>Canberra</p><button id="replay0">Replay intro</button></div></div>' +
+      '<div class="fbase"><span>&copy; ' + new Date().getFullYear() + ' Astris Productions</span><span>Josh</span></div>' +
+      '<div class="ribbon"><div class="rs"><div class="track">' + fr + fr + "</div></div></div></footer>";
+  }
+  function ribbonInit() { var r = $("#replay0"); if (r) r.onclick = function () { intro(true); }; }
+
+  /* ---------- routing: plain #names; a yellow strip wipes across between pages ---------- */
+  var TR = ["reel", "bars", "clap", "back", "iris"], COVER = { reel: 400, back: 400, bars: 470, clap: 420, iris: 500 }, trLast = "";
+  function transition(run) {
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { run(); return; }
+    var t; do { t = TR[Math.floor(Math.random() * TR.length)]; } while (t === trLast); trLast = t;
+    var pool = ["planet", "cyclist", "bands", "house", "oil1", "truck", "dew", "lamp"], frames = pool.concat(pool).map(function (k) { return '<i style="' + bg(k) + '"></i>'; }).join("");
+    var html = { reel: '<div class="rl"><div class="rin">' + frames + "</div></div>", back: '<div class="rl"><div class="rin">' + frames + "</div></div>",
+      bars: [0, 1, 2, 3, 4, 5, 6].map(function (i) { return '<div class="bar2" style="left:' + (i * 16 - 6) + '%;animation-delay:' + i * 55 + 'ms"></div>'; }).join(""), clap: '<div class="cl t"></div><div class="cl b"></div>', iris: '<div class="iris"></div>' }[t];
+    var tr = $("#tr"); tr.className = ""; tr.innerHTML = html; void tr.offsetWidth; tr.className = t;
+    setTimeout(run, COVER[t]); setTimeout(function () { tr.className = ""; tr.innerHTML = ""; }, 1250);
+  }
+  function route() { return (location.hash || "#home").slice(1); }
+  var first = true, last = "";
+  function show() {
+    var r = route(), page, arg;
+    if (/^film-/.test(r)) { page = "film"; arg = r.slice(5); } else if (/^news-/.test(r)) { page = "newspost"; arg = +r.slice(5); }
+    else if (r === "progress") { page = "films"; fs.show = "In progress"; } else { page = P[r] ? r : "home"; if (page === "films") fs.show = "All"; }
+    $("#lb").classList.remove("on"); $("#pl").classList.remove("on"); fl.classList.remove("on");
+    var run = function () {
+      var navKey = { film: "films", newspost: "news" }[page] || page;
+      document.body.dataset.page = navKey; $("#view").scrollTop = 0;
+      $$("#nav a").forEach(function (a) { a.setAttribute("aria-current", a.dataset.r === navKey ? "page" : "false"); });
+      $("#view").onscroll = null;
+      P[page](arg);
+      var v = $("#view");
+      if (page !== "home") { var w = document.createElement("div"); w.className = "pg"; while (v.firstChild) w.appendChild(v.firstChild); v.appendChild(w); }
+      v.insertAdjacentHTML("beforeend", footerHtml()); ribbonInit();
+    };
+    if (first || r === last) { first = false; run(); } else { transition(run); }
+    last = r;
+  }
+  window.addEventListener("hashchange", show); show(); if (route() === "home" || route() === "") intro(false);
+})();
+</script>
