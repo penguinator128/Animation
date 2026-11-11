@@ -18,7 +18,7 @@ from engine import type as T
 from engine.core import raster_polys, rounded_mask, save_png, save_png_alpha
 from engine.paths import out
 from engine.style import config
-from engine.video import FPS, H, W, Clip, ease_in_out, ease_out, ease_out_back, keys
+from engine.video import FPS, H, W, Clip, ease_in, ease_in_out, ease_out, keys, smooth, wipe
 
 F = 1.0 / FPS
 CX, CY = W / 2, H / 2
@@ -129,17 +129,14 @@ def clap(style, transparent=False):
     hx, hy = hinge
 
     def animate(t):
-        # everything slides up into frame, the stick lifts a touch more, snaps shut, and the board gives a little
-        k = ease_out_back((t - K_IN) / 0.42, 1.3)
-        dy = (150 * (1 - k) if t >= K_IN else 150) + K_DROP * (1 - ease_in_out((t - (K_CLAP + 0.22)) / 0.60))
-        a = min(1.0, max(0.0, (t - K_IN) / (3 * F)))
-        r = keys(t, [(0, OPEN), (K_LIFT, OPEN), (K_CLAP - 3 * F, OPEN - 5), (K_CLAP - 2 * F, OPEN - 5), (K_CLAP, 0.0),
-                     (K_CLAP + 2 * F, -3.2), (K_CLAP + 4 * F, 0.0)])
-        hit = keys(t, [(K_CLAP - F, 0), (K_CLAP, 16), (K_CLAP + 2 * F, -6), (K_CLAP + 4 * F, 2), (K_CLAP + 6 * F, 0)])
-        s = {"_": {"exposure": keys(t, [(K_CLAP - F, 1.0), (K_CLAP, 1.07), (K_CLAP + 3 * F, 1.0)])}}
-        s["board"] = {"a": a, "dy": dy + hit}
-        s["stick"] = {"a": a, "dy": dy + hit, "r": r, "cx": hx, "cy": hy}
-        return s
+        # the board glides up into frame, the stick lifts a little further, then shuts in one clean move,
+        # and the closed board rises gently to the centre. No bounce, no shake, no flash.
+        k = ease_out((t - K_IN) / 0.55, 5)
+        dy = 160 * (1 - k) + K_DROP * (1 - smooth((t - (K_CLAP + 0.25)) / 0.70))
+        a = min(1.0, max(0.0, (t - K_IN) / 0.18))
+        r = OPEN - 5 * ease_in_out((t - K_LIFT) / (K_CLAP - 0.14 - K_LIFT))
+        r *= 1 - ease_in((t - (K_CLAP - 0.14)) / 0.14, 3)
+        return {"board": {"a": a, "dy": dy}, "stick": {"a": a, "dy": dy, "r": r, "cx": hx, "cy": hy}}
     clip.animate = animate
     return clip
 
@@ -165,7 +162,6 @@ def audio_clap(style):
     m.add(kit.tap(seed=83, pitch=0.9), K_IN + 0.36, gain=0.3, send=0.2)
     m.add(kit.tick(seed=84, pitch=1.4), K_CLAP - 3 * F - 0.16, gain=0.16, send=0.2)             # the little lift
     m.add(clack(85, {"red": 0.8, "yellow": 1.15, "wildcard": 1.0}[kit.k]), K_CLAP - 0.004, gain=1.0, send=0.22)
-    m.add(clack(86, 0.7), K_CLAP + 4 * F, gain=0.16, pan=0.1, send=0.2)                          # the rebound settling
     m.add(S.sub_drop(0.5, 90, 48, 0.2, 0.3), K_CLAP, gain=0.22, send=0.0)
     m.add(kit.motif(1.5), K_CLAP + 0.30, gain=0.30, send=0.5)
     return mix_master(m, tail=0.35, kit=kit)
@@ -191,13 +187,10 @@ def presents(style, scheme="main"):
     art.text(word, CX, CY + 420, 92, face=style.text_face(500), tracking=0.36, anchor="mm", shadow=False, wear=0.3)
 
     def animate(t):
-        s = {"_": {"black": keys(t, [(0, 1.0), (0.45, 0.0), (P_DUR - 0.5, 0.0), (P_DUR - F, 1.0)]),
-                   "grain": keys(t, [(0, 1.5), (0.6, 1.0)])}}
-        k1 = ease_out((t - 0.30) / 0.55, 3)
-        s["logo"] = {"a": 0.0} if t < 0.30 else {"a": min(1.0, (t - 0.30) / (5 * F)), "s": 1.06 - 0.06 * k1}
-        p = ease_in_out((t - 0.75) / 0.60)
-        s["name"] = {"a": 0.0} if p <= 0 else ({"wipe": ("right", p, 0.06)} if p < 1 else {})
-        k3 = ease_out((t - 1.35) / 0.40, 2)
+        s = {"_": {"black": 1 - smooth(t / 0.5) + smooth((t - (P_DUR - 0.5)) / 0.5)}}
+        s["logo"] = {"a": ease_out((t - 0.30) / 0.40, 2), "s": 1.05 - 0.05 * ease_out((t - 0.30) / 1.0, 4)}
+        s["name"] = wipe("right", smooth((t - 0.75) / 0.65), 0.06)
+        k3 = ease_out((t - 1.35) / 0.50, 3)
         s["word"] = {"a": k3, "dy": 18 * (1 - k3)}
         return s
     clip.animate = animate

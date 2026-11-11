@@ -2,9 +2,13 @@
 The moving pieces of a style: three short intros, the animated title logo (on colour and transparent) and the end card.
 All 3840 x 2160, 24 fps, sound baked in, plus each soundtrack as a WAV.
 
-    A  POP   2 s   the field snaps in, the logo stamps on, the name lands under it
-    B  TYPE  4 s   the name reveals (typed / wiped / printed, by style), then the supporting line, then the logo
-    C  SLOW  7 s   the grain breathes, the logo draws itself, the name fades up, a warm chime rings out
+    A  POP   2 s   a slanted door opens on the style's colour, the logo pops in, the name rises under it
+    B  TYPE  4 s   the name arrives (letter by letter / pushed on by a clapper stick / printed in two passes),
+                   then the supporting line, then the logo
+    C  SLOW  7 s   a slow push in: the film strip and the bar draw themselves, the name fades up, a warm chime
+
+The motion is deliberately calm: smooth easing, real motion blur, no camera shake, no flashes, no rubbery bounces,
+and every piece ends on a still, held lockup you can cut away from.
 
 Usage: python3 code/build.py intros [--style red] [a b c title alpha end]     (no names = everything)
 """
@@ -18,35 +22,44 @@ from engine import sound as S
 from engine import type as T
 from engine.paths import out
 from engine.style import config
-from engine.video import FPS, H, W, Clip, ease_in_out, ease_out, ease_out_back, keys
+from engine.video import FPS, H, W, Clip, ease_in_out, ease_out, ease_in_out_sine, keys, smooth, wipe
 
 F = 1.0 / FPS
 CX, CY = W / 2, H / 2
 
 
-def on(t, t0):
-    return 1.0 if t >= t0 else 0.0
+def door_role(style):
+    """The colour of the opening panel: the style's dark (red, yellow) or a flood of the blue ink (risograph)."""
+    return {"red": "second", "yellow": "ink", "wildcard": "ink"}[style.key]
+
+
+def add_door(art, style):
+    art.tag = "door"
+    art.rect(-4, -4, W + 4, H + 4, role=door_role(style), size=900, crisp=True, shadow=False)
+    art.tag = "main"
 
 
 # ====================================================================================================
 # A - POP
 # ====================================================================================================
-A_FIELD, A_STAMP, A_TEXT, A_DUR = 2 * F, 10 * F, 21 * F, 2.0
+A_DUR = 2.0
+A_DOOR = (0.0, 0.34)             # the slanted panel slides off
+A_LOGO = (0.18, 0.66)            # the logo pops in
+A_W1, A_W2 = (0.56, 0.98), (0.70, 1.10)
 
 
 def intro_a(style):
     clip = Clip(style, A_DUR, seed=f"{style.key}-intro-a")
     L.vertical(clip.art, CX, CY, 780)
+    add_door(clip.art, style)
 
     def animate(t):
-        s = {"_": {"black": 1.0 if t < A_FIELD else 0.0, "exposure": keys(t, [(A_FIELD, 1.18), (A_FIELD + 3 * F, 1.0)]),
-                   "shake": (0, keys(t, [(A_STAMP + 1 * F, 0), (A_STAMP + 2 * F, 10), (A_STAMP + 3 * F, -4), (A_STAMP + 4 * F, 0)]))}}
-        s["logo"] = {"a": 0.0} if t < A_STAMP else {
-            "a": keys(t, [(A_STAMP, 0.6), (A_STAMP + F, 1.0)]),
-            "s": keys(t, [(A_STAMP, 1.34), (A_STAMP + F, 1.10), (A_STAMP + 2 * F, 0.962), (A_STAMP + 3 * F, 1.014), (A_STAMP + 4 * F, 1.0)])}
-        for tag, t0 in (("word1", A_TEXT), ("word2", A_TEXT + 2 * F)):
-            s[tag] = {"a": 0.0} if t < t0 else {"a": keys(t, [(t0, 0.6), (t0 + F, 1.0)]),
-                                                 "dy": keys(t, [(t0, -70), (t0 + F, 12), (t0 + 2 * F, -5), (t0 + 3 * F, 0)])}
+        s = {"door": wipe("diag", 1 - smooth((t - A_DOOR[0]) / (A_DOOR[1] - A_DOOR[0])), 0.012)}     # slides off, edge parallel to the logo's slant
+        k = ease_out((t - A_LOGO[0]) / (A_LOGO[1] - A_LOGO[0]), 5)
+        s["logo"] = {"a": min(1.0, max(0.0, (t - A_LOGO[0]) / 0.12)), "s": 0.80 + 0.20 * k, "dy": 36 * (1 - k)}
+        for tag, (t0, t1), kind in (("word1", A_W1, "up"), ("word2", A_W2, "right")):
+            p = ease_out((t - t0) / (t1 - t0), 4)
+            s[tag] = dict(wipe(kind, p, 0.05), dy=(24 * (1 - p) if kind == "up" else 0.0))
         return s
     clip.animate = animate
     return clip
@@ -56,20 +69,19 @@ def audio_a(style):
     kit = Kit(style)
     m = S.Mix(A_DUR)
     m.add(kit.bed(A_DUR, 1), 0.0, gain=0.05, send=0.0)
-    m.add(kit.tick(seed=2, pitch=0.8), A_FIELD, gain=0.5, send=0.2)
-    m.add(kit.swell(0.3, 3), max(0.0, A_STAMP - 0.3), gain=0.16, send=0.2)
-    m.add(kit.hit(1.25, seed=4), A_STAMP, gain=1.0, send=0.3)
-    m.add(S.sub_drop(0.9, 78, 40, 0.25, 0.5), A_STAMP, gain=0.35, send=0.0)
-    m.add(kit.tap(seed=5), A_TEXT, gain=0.55, pan=-0.15, send=0.25)
-    m.add(kit.tick(seed=6, pitch=1.2), A_TEXT + 2 * F, gain=0.35, pan=0.2, send=0.25)
-    m.add(kit.chime(dur=1.5), A_STAMP + 0.04, gain=0.42, send=0.5)
-    return mix_master(m, tail=0.22, kit=kit)
+    m.add(kit.whoosh(0.42, seed=2), 0.0, gain=0.30, send=0.25)
+    m.add(kit.hit(1.1, seed=4), A_LOGO[0] + 0.02, gain=0.85, send=0.3)
+    m.add(S.sub_drop(0.8, 74, 40, 0.25, 0.45), A_LOGO[0] + 0.02, gain=0.26, send=0.0)
+    m.add(kit.chime(dur=1.6), A_LOGO[0] + 0.06, gain=0.40, send=0.5)
+    m.add(kit.tap(seed=5), A_W1[0] + 0.04, gain=0.45, pan=-0.15, send=0.25)
+    m.add(kit.tick(seed=6, pitch=1.2), A_W2[0] + 0.04, gain=0.28, pan=0.2, send=0.25)
+    return mix_master(m, tail=0.25, kit=kit)
 
 
 # ====================================================================================================
 # B - TYPE
 # ====================================================================================================
-B_DUR, B_TYPE0, B_TYPE1, B_TAG, B_LOGO = 4.0, 0.55, 1.85, 2.2, 2.8
+B_DUR, B_TYPE0, B_TYPE1, B_TAG, B_LOGO = 4.0, 0.45, 1.85, 2.15, 2.65
 B_LOGO_H, B_NAME_W = 660, 2500
 B_LOGO_Y, B_NAME_Y = 730, 1450
 
@@ -101,28 +113,28 @@ def intro_b(style):
         x0 = x_left - 60
         art.polygon([(x0, yb + hgt * 0.22), (x0 + 74, yb + hgt * 0.22), (x0 + 74 + hgt * 0.5, yb - hgt * 0.78), (x0 + hgt * 0.5, yb - hgt * 0.78)], crisp=False)
     nL = len(letters)
-    step = (B_TYPE1 - B_TYPE0) / nL
+    step = (B_TYPE1 - 0.25 - B_TYPE0) / max(1, nL - 1)
     clip.letter_times = [B_TYPE0 + n * step for n in range(nL)]
+    w0, w1 = B_TYPE0, B_TYPE1 - 0.25
 
     def animate(t):
-        s = {"_": {"exposure": keys(t, [(0, 1.10), (0.5, 1.0)]), "grain": keys(t, [(0, 1.7), (0.5, 1.0)])}}
-        if mode == "typed":
+        s = {}
+        if mode == "typed":            # each letter rises into place and fades up, one after another
             for n, t0 in enumerate(clip.letter_times):
-                s[f"ch{n:02d}"] = {"a": 0.0} if t < t0 else {"s": keys(t, [(t0, 1.22), (t0 + 2 * F, 0.975), (t0 + 3 * F, 1.0)])}
-        elif mode == "wiped":
-            p = ease_in_out((t - B_TYPE0) / (B_TYPE1 - 0.35 - B_TYPE0))
-            s["name"] = {"wipe": ("right", p, 0.004)} if p < 1 else {}
-            if p <= 0:
-                s["name"] = {"a": 0.0}
-            s["stick"] = {"a": 1.0 if 0 < p < 1 else 0.0, "dx": p * (B_NAME_W + 150)}
-        else:   # printed: second colour first, then the main ink over it
-            p1 = ease_in_out((t - B_TYPE0) / 0.42)
-            p2 = ease_in_out((t - (B_TYPE0 + 0.62)) / 0.42)
-            s["name~"] = {"wipe": ("down", p1, 0.03)} if 0 < p1 < 1 else ({"a": 0.0} if p1 <= 0 else {})
-            s["name"] = {"wipe": ("down", p2, 0.03)} if 0 < p2 < 1 else ({"a": 0.0} if p2 <= 0 else {})
-        s["tagline"] = {"a": ease_out((t - B_TAG) / (6 * F)), "dy": 14 * (1 - ease_out((t - B_TAG) / (6 * F)))}
-        k = (t - B_LOGO) / (8 * F)
-        s["logo"] = {"a": 0.0} if t < B_LOGO else {"a": min(1.0, k * 2.5), "s": 0.86 + 0.14 * ease_out_back(k)}
+                k = ease_out((t - t0) / 0.30, 4)
+                s[f"ch{n:02d}"] = {"a": min(1.0, max(0.0, (t - t0) / 0.10)), "dy": 30 * (1 - k)}
+        elif mode == "wiped":          # the stick glides across and the name follows it
+            p = smooth((t - w0) / (w1 - w0))
+            s["name"] = wipe("right", p, 0.004)
+            fade = min(1.0, max(0.0, (t - w0) / 0.12)) * (1 - smooth((t - (w1 - 0.04)) / 0.30))
+            s["stick"] = {"a": fade, "dx": p * (B_NAME_W + 150) + 90 * smooth((t - w1) / 0.4)}
+        else:                          # printed: the coral pass, then the blue pass over it
+            s["name~"] = wipe("down", ease_in_out((t - w0) / 0.55), 0.035)
+            s["name"] = wipe("down", ease_in_out((t - (w0 + 0.55)) / 0.55), 0.035)
+        k = ease_out((t - B_TAG) / 0.45, 3)
+        s["tagline"] = {"a": k, "dy": 16 * (1 - k)}
+        k = ease_out((t - B_LOGO) / 0.70, 5)
+        s["logo"] = {"a": min(1.0, max(0.0, (t - B_LOGO) / 0.20)), "s": 0.92 + 0.08 * k, "dy": 30 * (1 - k)}
         return s
     clip.animate = animate
     clip.mode = mode
@@ -133,24 +145,25 @@ def audio_b(style, clip):
     kit = Kit(style)
     m = S.Mix(B_DUR)
     m.add(kit.bed(B_DUR, 11), 0.0, gain=0.06, send=0.0)
-    m.add(kit.swell(0.5, 12), 0.0, gain=0.10, send=0.3)
+    m.add(kit.swell(0.45, 12), 0.0, gain=0.08, send=0.3)
+    w0, w1 = B_TYPE0, B_TYPE1 - 0.25
     if clip.mode == "typed":
         r = np.random.default_rng(13)
         for n, t0 in enumerate(clip.letter_times):
-            m.add(kit.tick(seed=20 + n, pitch=r.uniform(0.85, 1.2)), t0, gain=r.uniform(0.32, 0.46), pan=-0.5 + n / len(clip.letter_times), send=0.2)
-        m.add(kit.tap(seed=14), B_TYPE1 + 0.02, gain=0.35, send=0.25)          # the full stop
+            m.add(kit.tick(seed=20 + n, pitch=r.uniform(0.9, 1.15)), t0, gain=r.uniform(0.24, 0.34), pan=-0.5 + n / len(clip.letter_times), send=0.25)
+        m.add(kit.tap(seed=14), clip.letter_times[-1] + 0.06, gain=0.30, send=0.25)          # the full stop
     elif clip.mode == "wiped":
-        m.add(kit.whoosh(B_TYPE1 - 0.35 - B_TYPE0, seed=15), B_TYPE0, gain=0.4, send=0.3)
-        m.add(kit.hit(0.9, seed=16), B_TYPE1 - 0.35, gain=0.7, send=0.3)         # the stick claps home
+        m.add(kit.whoosh(w1 - w0 + 0.1, seed=15), w0, gain=0.34, send=0.3)
+        m.add(kit.tap(seed=16), w1, gain=0.40, send=0.3)
     else:
-        for j, t0 in enumerate((B_TYPE0, B_TYPE0 + 0.62)):
-            m.add(kit.hit(0.85 + 0.15 * j, seed=17 + j), t0, gain=0.6 + 0.15 * j, send=0.25)
-            m.add(S.sos(S.noise(0.42, "pink", 19 + j), "bandpass", (700, 4200), 2) * np.sin(np.pi * np.linspace(0, 1, int(0.42 * S.SR))) ** 0.8,
-                  t0, gain=0.10, pan=-0.2 + 0.4 * j, send=0.2)
-    m.add(kit.tick(seed=30, pitch=1.3), B_TAG, gain=0.3, send=0.3)
-    m.add(kit.swell(0.35, 31), B_LOGO - 0.35, gain=0.13, send=0.3)
-    m.add(kit.hit(1.0, seed=32), B_LOGO + F, gain=0.75, send=0.3)
-    m.add(kit.motif(1.6), B_LOGO + 0.03, gain=0.5, send=0.55)
+        for j, t0 in enumerate((w0, w0 + 0.55)):
+            m.add(kit.hit(0.75 + 0.15 * j, seed=17 + j), t0 + 0.02, gain=0.48 + 0.12 * j, send=0.25)
+            m.add(S.sos(S.noise(0.55, "pink", 19 + j), "bandpass", (700, 4200), 2) * np.sin(np.pi * np.linspace(0, 1, int(0.55 * S.SR))) ** 0.8,
+                  t0, gain=0.08, pan=-0.2 + 0.4 * j, send=0.2)
+    m.add(kit.tick(seed=30, pitch=1.3), B_TAG + 0.02, gain=0.22, send=0.3)
+    m.add(kit.swell(0.4, 31), B_LOGO - 0.38, gain=0.10, send=0.3)
+    m.add(kit.hit(0.85, seed=32), B_LOGO + 0.02, gain=0.55, send=0.3)
+    m.add(kit.motif(1.5), B_LOGO + 0.06, gain=0.50, send=0.55)
     return mix_master(m, tail=0.3, kit=kit)
 
 
@@ -158,36 +171,34 @@ def audio_b(style, clip):
 # C - SLOW
 # ====================================================================================================
 C_DUR = 7.0
-C_STRIP, C_BAR, C_W1, C_W2, C_CHIME = (0.8, 2.4), (1.9, 3.4), (3.7, 4.5), (4.1, 4.9), 4.0
+C_STRIP, C_BAR, C_W1, C_W2, C_CHIME = (0.7, 2.4), (1.8, 3.5), (3.7, 4.7), (4.1, 5.1), 4.0
+C_PUSH = 0.03                     # the whole picture grows by 3 % over the 7 seconds: a slow push in
 
 
 def intro_c(style):
     clip = Clip(style, C_DUR, seed=f"{style.key}-intro-c")
     art = clip.art
-    lg = style.logo
     logo_h = 780
-    # same placement as the vertical lockup, but the two halves of the logo are separate so each can draw on
     probe = Clip(style, 1, seed="probe")
-    box = L.vertical(probe.art, CX, CY, logo_h)
+    box = L.vertical(probe.art, CX, CY, logo_h)                     # same placement as the vertical lockup
     top = box[1]
-    for part, tag in (("film-strip", "strip"), ("bar", "bar")):
+    for part, tag in (("film-strip", "strip"), ("bar", "bar")):     # the two halves are separate so each can draw on
         art.tag = tag
         art.logo(CX, top + logo_h / 2, logo_h, parts=[part])
-    width = logo_h * lg.aspect
+    width = logo_h * style.logo.aspect
     s1, s2, track = L.stacked_sizes(style.display, width)
     words_h = style.display.cap * s1 * 1.20 + style.display.cap * s2
     L.stacked(art, CX, top + logo_h + 0.26 * logo_h + words_h / 2, width)
 
     def animate(t):
-        breathe = 1.0 + 0.26 * np.sin(2 * np.pi * t / 3.5)
-        s = {"_": {"grain": float(breathe), "exposure": keys(t, [(0, 0.90), (1.0, 1.0)])}}
-        p = ease_in_out((t - C_STRIP[0]) / (C_STRIP[1] - C_STRIP[0]))
-        s["strip"] = {"a": 0.0} if p <= 0 else ({"wipe": ("strip_up", p, 0.07)} if p < 1 else {})
-        p = ease_in_out((t - C_BAR[0]) / (C_BAR[1] - C_BAR[0]))
-        s["bar"] = {"a": 0.0} if p <= 0 else ({"wipe": ("bar_down", p, 0.07)} if p < 1 else {})
+        cam = 1.0 + C_PUSH * ease_in_out_sine(t / C_DUR)
+        base = {"s": cam, "cx": CX, "cy": CY}
+        s = {"_": {"exposure": 0.93 + 0.07 * smooth(t / 1.4)}}
+        s["strip"] = dict(base, **wipe("strip_up", ease_in_out_sine((t - C_STRIP[0]) / (C_STRIP[1] - C_STRIP[0])), 0.08))
+        s["bar"] = dict(base, **wipe("bar_down", ease_in_out_sine((t - C_BAR[0]) / (C_BAR[1] - C_BAR[0])), 0.08))
         for tag, (t0, t1) in (("word1", C_W1), ("word2", C_W2)):
-            k = ease_out((t - t0) / (t1 - t0), 2)
-            s[tag] = {"a": k, "dy": 22 * (1 - k)}
+            k = ease_out((t - t0) / (t1 - t0), 3)
+            s[tag] = dict(base, a=k, dy=22 * (1 - k))
         return s
     clip.animate = animate
     return clip
@@ -198,22 +209,22 @@ def audio_c(style):
     m = S.Mix(C_DUR)
     m.add(kit.bed(C_DUR, 41), 0.0, gain=0.09, send=0.0)
     r = kit.root
-    m.add(S.pad([S.midi(n) for n in (r - 12, r - 5, r)], 4.4, attack=2.4, release=1.6, cutoff=(200, 1300), level=1.0, seed=42), 0.5, gain=0.16, send=0.5)
-    m.add(kit.whoosh(1.6, seed=43), C_STRIP[0], gain=0.10, send=0.4)
-    m.add(kit.whoosh(1.5, seed=44, up=False), C_BAR[0], gain=0.10, send=0.4)
-    m.add(kit.tick(seed=45, pitch=0.9), C_BAR[1], gain=0.22, send=0.4)
-    m.add(kit.swell(0.6, 46), C_CHIME - 0.6, gain=0.12, send=0.4)
+    m.add(S.pad([S.midi(n) for n in (r - 12, r - 5, r)], 4.4, attack=2.4, release=1.6, cutoff=(200, 1300), level=1.0, seed=42), 0.4, gain=0.16, send=0.5)
+    m.add(kit.whoosh(1.7, seed=43), C_STRIP[0], gain=0.09, send=0.4)
+    m.add(kit.whoosh(1.7, seed=44, up=False), C_BAR[0], gain=0.09, send=0.4)
+    m.add(kit.tick(seed=45, pitch=0.9), C_BAR[1] - 0.05, gain=0.18, send=0.4)
+    m.add(kit.swell(0.6, 46), C_CHIME - 0.6, gain=0.11, send=0.4)
     m.add(kit.chord(3.0), C_CHIME, gain=0.26, send=0.6)
     m.add(kit.motif(3.0), C_CHIME, gain=0.75, send=0.6)
-    m.add(kit.chime(kit.root + 24, 2.4), C_W2[0] + 0.25, gain=0.16, pan=0.25, send=0.6)
+    m.add(kit.chime(kit.root + 24, 2.4), C_W2[0] + 0.3, gain=0.14, pan=0.25, send=0.6)
     return mix_master(m, tail=0.9, wet=0.75, ir=2.4, kit=kit)
 
 
 # ====================================================================================================
 # animated title logo (on colour, and transparent)
 # ====================================================================================================
-T_DUR, T_STRIP, T_BAR, T_HOLES, T_SETTLE = 5.0, (0.3, 1.0), (0.55, 1.3), 1.42, 2.3
-T_HOLE_STEP = 0.034
+T_DUR, T_STRIP, T_BAR, T_HOLES, T_HOLE_STEP = 5.0, (0.25, 1.20), (0.45, 1.40), 1.45, 0.030
+T_TRAVEL = 720
 
 
 def title_logo(style, transparent=False):
@@ -225,7 +236,7 @@ def title_logo(style, transparent=False):
     art.logo(cx, cy, h, parts=["film-strip"], solid=True)
     art.tag = "bar"
     art.logo(cx, cy, h, parts=["bar"])
-    # each sprocket hole is punched out of the strip on its own beat (bottom to top, the two columns taking turns)
+    # the sprocket holes open one after another, bottom to top, the two columns taking turns
     polys = lg.polys(cx - h * lg.aspect / 2, cy - h / 2, h, ["film-strip"])[0][2]
     names = [q["name"] for q in lg.parts[0]["holes"]]
     left = sorted([i for i, n in enumerate(names) if "left" in n], key=lambda i: -polys[i][:, 1].mean())
@@ -242,16 +253,13 @@ def title_logo(style, transparent=False):
     up, down = np.array([0.4472, -0.8944]), np.array([0.4472, 0.8944])
 
     def animate(t):
-        pop = keys(t, [(T_SETTLE - 0.08, 1.0), (T_SETTLE + 0.03, 1.035), (T_SETTLE + 0.2, 1.0)])
-        s = {"_": {}}
-        k = ease_out((t - T_STRIP[0]) / (T_STRIP[1] - T_STRIP[0]), 3)
-        d = -up * 1050 * (1 - k)
-        s["strip"] = {"a": 0.0} if t < T_STRIP[0] else {"a": min(1.0, (t - T_STRIP[0]) / (4 * F)), "dx": d[0], "dy": d[1], "s": pop, "cx": cx, "cy": cy}
-        k = ease_out_back((t - T_BAR[0]) / (T_BAR[1] - T_BAR[0]), 1.1)
-        d = -down * 1150 * (1 - k)
-        s["bar"] = {"a": 0.0} if t < T_BAR[0] else {"a": min(1.0, (t - T_BAR[0]) / (4 * F)), "dx": d[0], "dy": d[1], "s": pop, "cx": cx, "cy": cy}
+        s = {}
+        for tag, (t0, t1), axis in (("strip", T_STRIP, up), ("bar", T_BAR, down)):
+            k = ease_out((t - t0) / (t1 - t0), 5)
+            d = -axis * T_TRAVEL * (1 - k)            # each half glides in along its own slant
+            s[tag] = {"a": min(1.0, max(0.0, (t - t0) / 0.16)), "dx": float(d[0]), "dy": float(d[1])}
         for tag, (t0, _) in clip.hole_times.items():
-            s[tag] = {"a": on(t, t0), "s": pop, "cx": cx, "cy": cy}
+            s[tag] = {"a": min(1.0, max(0.0, (t - t0) / (2 * F)))}
         return s
     clip.animate = animate
     return clip
@@ -261,20 +269,21 @@ def audio_title(style, clip):
     kit = Kit(style)
     m = S.Mix(T_DUR)
     m.add(kit.bed(T_DUR, 51), 0.0, gain=0.05, send=0.0)
-    m.add(kit.whoosh(0.7, seed=52), T_STRIP[0], gain=0.32, pan=-0.3, send=0.3)
-    m.add(kit.whoosh(0.75, seed=53, up=False), T_BAR[0], gain=0.32, pan=0.3, send=0.3)
-    m.add(kit.tap(seed=54), T_STRIP[1] - 0.05, gain=0.45, pan=-0.2, send=0.25)
-    m.add(kit.hit(1.1, seed=55), T_BAR[1] - 0.06, gain=0.85, pan=0.1, send=0.3)
+    m.add(kit.whoosh(0.8, seed=52), T_STRIP[0], gain=0.26, pan=-0.3, send=0.3)
+    m.add(kit.whoosh(0.8, seed=53, up=False), T_BAR[0], gain=0.26, pan=0.3, send=0.3)
+    m.add(kit.tap(seed=54), T_STRIP[0] + 0.55, gain=0.30, pan=-0.2, send=0.25)
+    m.add(kit.hit(0.9, seed=55), T_BAR[0] + 0.55, gain=0.55, pan=0.1, send=0.3)
     for n, (tag, (t0, pan)) in enumerate(sorted(clip.hole_times.items(), key=lambda kv: kv[1][0])):
-        m.add(kit.tick(seed=60 + n, pitch=0.8 + 0.022 * n), t0, gain=0.26, pan=float(np.clip(pan, -0.7, 0.7)), send=0.25)
-    m.add(kit.swell(0.4, 56), T_SETTLE - 0.4, gain=0.12, send=0.3)
-    m.add(kit.chord(2.6), T_SETTLE, gain=0.22, send=0.55)
-    m.add(kit.motif(2.6), T_SETTLE, gain=0.7, send=0.55)
+        m.add(kit.tick(seed=60 + n, pitch=0.85 + 0.018 * n), t0, gain=0.16, pan=float(np.clip(pan, -0.7, 0.7)), send=0.3)
+    settle = T_HOLES + len(clip.hole_times) * T_HOLE_STEP + 0.1
+    m.add(kit.swell(0.4, 56), settle - 0.4, gain=0.10, send=0.3)
+    m.add(kit.chord(2.6), settle, gain=0.22, send=0.55)
+    m.add(kit.motif(2.6), settle, gain=0.68, send=0.55)
     return mix_master(m, tail=0.5, wet=0.65, ir=2.0, kit=kit)
 
 
 # ====================================================================================================
-# end card: room for two video suggestions and the channel icon; loops seamlessly
+# end card: room for two video suggestions and the channel icon; loops seamlessly, and barely moves
 # ====================================================================================================
 E_DUR = 10.0
 E_SLOT_W, E_SLOT_H = 1400, 788
@@ -308,13 +317,11 @@ def end_card(style):
     art.text(style.tagline, CX, cy + r + 86, 54, tracking=L.TRACK_TAG, anchor="mm", shadow=False)
 
     def animate(t):
-        w = 2 * np.pi * t / E_DUR
-        s = {"_": {"grain": 1.0 + 0.12 * np.sin(2 * w)}}
-        s["slot0"] = {"a": 0.80 + 0.20 * np.sin(2 * w)}
-        s["slot1"] = {"a": 0.80 + 0.20 * np.sin(2 * w + np.pi)}
-        s["fill0"] = {"a": 0.75 + 0.25 * np.sin(2 * w + 0.6)}
-        s["fill1"] = {"a": 0.75 + 0.25 * np.sin(2 * w + np.pi + 0.6)}
-        s["icon"] = {"s": 1.0 + 0.022 * np.sin(3 * w), "cx": cx, "cy": cy}
+        w = 2 * np.pi * t / E_DUR                         # one slow cycle in ten seconds, so the loop has no seam
+        s = {"fill0": {"a": 0.86 + 0.14 * np.sin(w)}, "fill1": {"a": 0.86 + 0.14 * np.sin(w + np.pi)}}
+        float_y = 6.0 * np.sin(w)
+        s["icon"] = {"dy": float_y}
+        s["ring"] = {"dy": float_y}
         return s
     clip.animate = animate
     return clip
@@ -338,6 +345,8 @@ def audio_end(style):
 
 # ====================================================================================================
 PIECES = ["a", "b", "c", "title", "alpha", "end"]
+KEY_TIMES = {"a": [0.0, 0.12, 0.22, 0.34, 0.62, 0.80, 1.95], "b": [0.5, 0.9, 1.3, 1.75, 2.3, 2.85, 3.95],
+             "c": [0.4, 1.4, 2.2, 3.0, 3.9, 4.6, 6.95], "title": [0.3, 0.5, 0.8, 1.2, 1.6, 2.0, 4.95], "end": [0.0, 2.5, 5.0, 7.5]}
 
 
 def test_sheet(style, which=("a", "b", "c", "title", "end")):
@@ -347,10 +356,7 @@ def test_sheet(style, which=("a", "b", "c", "title", "end")):
     rows = []
     for w in which:
         clip = {"a": intro_a, "b": intro_b, "c": intro_c, "title": title_logo, "end": end_card}[w](style)
-        n = clip.n
-        fr = {"a": [1, 3, 10, 12, 21, 24, 47], "b": [4, 22, 34, 46, 56, 68, 95], "c": [10, 36, 52, 70, 92, 104, 167],
-              "title": [10, 18, 28, 36, 44, 56, 119], "end": [0, 60, 120, 180]}[w]
-        tiles = [cv2.resize(clip.frame(min(f, n - 1)), (640, 360), interpolation=cv2.INTER_AREA) for f in fr]
+        tiles = [cv2.resize(clip.frame(min(int(round(tt * FPS)), clip.n - 1)), (640, 360), interpolation=cv2.INTER_AREA) for tt in KEY_TIMES[w]]
         while len(tiles) < 7:
             tiles.append(np.zeros((360, 640, 3), np.uint8))
         rows.append(np.concatenate(tiles, 1))

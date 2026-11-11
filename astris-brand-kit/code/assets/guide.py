@@ -512,9 +512,9 @@ class Guide:
         self.start("motion and sound")
         y = self.h1("motion and sound.")
         v = self.f(SUB["video"])
-        clips = [("A  pop, 2 s", f"astris-{k}-intro-a-pop-2s-4k24.mp4", (0.42, 0.50, 1.9), "For shorts and quick cuts. The logo stamps on, the name lands."),
-                 ("B  type, 4 s", f"astris-{k}-intro-b-type-4s-4k24.mp4", (1.0, 2.5, 3.9), "For everyday videos. The name arrives, then the line, then the logo."),
-                 ("C  slow, 7 s", f"astris-{k}-intro-c-slow-7s-4k24.mp4", (1.6, 3.1, 6.9), "For films. The logo draws itself and a chime rings out.")]
+        clips = [("A  pop, 2 s", f"astris-{k}-intro-a-pop-2s-4k24.mp4", (0.16, 0.42, 1.95), "For shorts and quick cuts. A slanted door opens, the logo pops in, the name rises."),
+                 ("B  type, 4 s", f"astris-{k}-intro-b-type-4s-4k24.mp4", (1.2, 2.4, 3.95), "For everyday videos. The name arrives, then the line, then the logo."),
+                 ("C  slow, 7 s", f"astris-{k}-intro-c-slow-7s-4k24.mp4", (1.6, 3.2, 6.95), "For films. A slow push in: the logo draws itself and a chime rings out.")]
         y += 4
         gap = 2.5
         fw = (CW - 46 - 2 * gap) / 3
@@ -528,8 +528,10 @@ class Guide:
         self.rule(X0, y, X1)
         half = (CW - 8) / 2
         self.lab("how things move", X0, y + 8)
-        self.bullets(["Quick and soft: things arrive in a few frames and settle with a small bounce.", "Every intro ends on a held, still lockup you can cut away from.",
-                      "The grain is alive in every frame. The colour field never moves.", "Also in the folder: a 5 s title logo (on colour and transparent) and a 10 s end card."],
+        self.bullets(["Calm and smooth: things glide in and settle softly. No camera shake, no flashes, no rubbery bounce.",
+                      "Real motion blur on anything that moves, so fast moves read as one clean movement.",
+                      "Every piece ends on a still, held lockup you can cut away from. The grain stays alive; the colour field never moves.",
+                      "Also in the folder: a 5 s title logo (on colour and transparent) and a 10 s end card."],
                      X0, y + 14, half, size=8.2, gap=0.8)
         self.lab("how it sounds", X0 + half + 8, y + 8)
         self.bullets([f"The palette: {SOUND[k]}.", "The signature: two notes, the second a fourth above the first. It is in every intro, in this style's own voice.",

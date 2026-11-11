@@ -20,7 +20,7 @@ from engine import type as T
 from engine.core import grain_field, hex_rgb, press, rng_for, save_png_alpha
 from engine.paths import STYLE_DIRS, SUB, WORK, out
 from engine.style import config
-from engine.video import FPS, H, W, X264, Clip, ease_in_out, ease_out, ease_out_back, keys
+from engine.video import FPS, GRAIN_SETS, H, W, X264, Clip, ease_in_out, ease_out, keys, smooth, wipe
 
 F = 1.0 / FPS
 
@@ -144,14 +144,11 @@ def lower_third(style, design, entry=None):
 
         def animate(tt):
             o = out_p(tt)
-            k1 = ease_out_back((tt - 0.20) / 0.30, 1.6)
-            s = {"tile": {"a": 0.0} if tt < 0.20 else {"s": (0.6 + 0.4 * k1) * (0.7 + 0.3 * o) if o < 1 else 0.6 + 0.4 * k1, "a": min(1.0, (tt - 0.2) / (2 * F)) * min(1.0, o * 2), "cx": pv[0], "cy": pv[1]}}
-            p = min(ease_in_out((tt - 0.34) / 0.42), out_p(tt, LT_OUT - 0.06))
-            s["bar"] = {"a": 0.0} if p <= 0 else ({"wipe": ("right", p, 0.01)} if p < 1 else {})
-            p = min(ease_in_out((tt - 0.52) / 0.36), out_p(tt, LT_OUT - 0.14, 0.24))
-            s["name"] = {"a": 0.0} if p <= 0 else ({"wipe": ("right", p, 0.03)} if p < 1 else {})
-            a = min(ease_out((tt - 0.78) / 0.25), out_p(tt, LT_OUT - 0.16, 0.2))
-            s["title"] = {"a": max(0.0, a)}
+            k1 = ease_out((tt - 0.20) / 0.45, 5)
+            s = {"tile": {"a": min(1.0, max(0.0, (tt - 0.20) / 0.15)) * min(1.0, o * 1.5), "s": (0.86 + 0.14 * k1) * (0.94 + 0.06 * o), "cx": pv[0], "cy": pv[1]}}
+            s["bar"] = wipe("right", min(smooth((tt - 0.36) / 0.45), out_p(tt, LT_OUT - 0.06)), 0.01)
+            s["name"] = wipe("right", min(smooth((tt - 0.52) / 0.40), out_p(tt, LT_OUT - 0.14, 0.24)), 0.03)
+            s["title"] = {"a": max(0.0, min(ease_out((tt - 0.78) / 0.30), out_p(tt, LT_OUT - 0.16, 0.2)))}
             return s
     elif design == 2:
         # no box: a line draws on, the name rises out of it, the title settles under it
@@ -167,14 +164,11 @@ def lower_third(style, design, entry=None):
         put("title", title, LT_X + 3, yb + 48 + 34 + tf.cap * 50, 50, t["light"], tf, 0.16, wear=0)
 
         def animate(tt):
-            p = min(ease_in_out((tt - 0.20) / 0.40), out_p(tt))
-            s = {"line": {"a": 0.0} if p <= 0 else ({"wipe": ("right", p, 0.01)} if p < 1 else {})}
-            kk = ease_out((tt - 0.42) / 0.40, 3)
-            o = out_p(tt, LT_OUT - 0.10, 0.26)
-            p = min(kk, o)
-            s["name"] = {"a": 0.0} if p <= 0 else ({"wipe": ("up", p, 0.04), "dy": 34 * (1 - p)} if p < 1 else {})
-            a = min(ease_out((tt - 0.72) / 0.28), out_p(tt, LT_OUT - 0.14, 0.2))
-            s["title"] = {"a": max(0.0, a), "dx": -24 * (1 - max(0.0, a))}
+            s = {"line": wipe("right", min(smooth((tt - 0.20) / 0.45), out_p(tt)), 0.01)}
+            p = min(ease_out((tt - 0.42) / 0.45, 4), out_p(tt, LT_OUT - 0.10, 0.26))
+            s["name"] = dict(wipe("up", p, 0.04), dy=30 * (1 - p))
+            a = max(0.0, min(ease_out((tt - 0.72) / 0.32), out_p(tt, LT_OUT - 0.14, 0.2)))
+            s["title"] = {"a": a, "dx": -20 * (1 - a)}
             return s
     else:
         # two labels, stamped on at a slight tilt: the name on the dark one, the title on a tab of colour
@@ -197,12 +191,11 @@ def lower_third(style, design, entry=None):
         tilt = -2.0
 
         def animate(tt):
-            o = out_p(tt, LT_OUT, 0.22)
-            t0 = 0.25
-            s = {"box": {"a": 0.0} if tt < t0 else {"a": min(1.0, (tt - t0) / F) * o, "r": tilt, "cx": pv[0], "cy": pv[1],
-                                                     "s": keys(tt, [(t0, 1.28), (t0 + 2 * F, 0.97), (t0 + 4 * F, 1.0)]) * (0.9 + 0.1 * o)}}
-            kk = ease_out_back((tt - 0.46) / 0.30, 1.4)
-            s["tab"] = {"a": 0.0} if tt < 0.46 else {"a": min(1.0, (tt - 0.46) / (2 * F)) * o, "r": tilt, "cx": pv[0], "cy": pv[1], "dy": -70 * (1 - kk)}
+            o = out_p(tt, LT_OUT, 0.26)
+            k = ease_out((tt - 0.25) / 0.40, 5)
+            s = {"box": {"a": min(1.0, max(0.0, (tt - 0.25) / 0.14)) * o, "r": tilt, "cx": pv[0], "cy": pv[1], "s": (1.06 - 0.06 * k) * (0.96 + 0.04 * o)}}
+            kk = ease_out((tt - 0.48) / 0.40, 4)
+            s["tab"] = {"a": min(1.0, max(0.0, (tt - 0.48) / 0.14)) * o, "r": tilt, "cx": pv[0], "cy": pv[1], "dy": -46 * (1 - kk)}
             return s
     clip.animate = animate
     return clip
@@ -245,13 +238,19 @@ GRAINS = {"fine": (0.70, 0.050), "medium": (1.20, 0.056), "coarse": (2.00, 0.062
 
 
 def grain_loop(name, path):
+    """Three unrelated grain textures used in turn, each moved somewhere new every time it comes back (see engine/video.py):
+    fresh grain on every frame, nothing that appears to slide or tremble, and a small file."""
     sigma, amp = GRAINS[name]
-    g = grain_field(H, W, f"overlay-{name}", sigma)
-    base = np.clip((0.5 + amp * g) * 255.0 + 0.5, 0, 255).astype(np.uint8)
+    bases = [np.clip((0.5 + amp * grain_field(H, W, f"overlay-{name}-{k}", sigma)) * 255.0 + 0.5, 0, 255).astype(np.uint8) for k in range(GRAIN_SETS)]
     r = rng_for("overlay-walk", name)
-    steps = r.integers(6, 15, (OV_N, 2)) * r.choice([-1, 1], (OV_N, 2))
-    walk = np.cumsum(steps, axis=0)
-    return _encode(path, (np.roll(np.roll(base, int(walk[i, 0]), 0), int(walk[i, 1]), 1) for i in range(OV_N)))
+    uses = OV_N // GRAIN_SETS + 2
+    walk = np.cumsum(r.integers(8, 25, (uses, GRAIN_SETS, 2)) * r.choice([-1, 1], (uses, GRAIN_SETS, 2)), axis=0)
+
+    def frames():
+        for i in range(OV_N):
+            k, u = i % GRAIN_SETS, i // GRAIN_SETS
+            yield np.roll(np.roll(bases[k], int(walk[u, k, 0]), 0), int(walk[u, k, 1]), 1)
+    return _encode(path, frames())
 
 
 def dust_loop(path):
@@ -337,10 +336,10 @@ def overlays(style):
     n = 0
     # grain and dust are colour-neutral, so one render is shared by all three styles (same file, same name)
     for name in GRAINS:
-        f = shared / f"astris-overlay-grain-{name}-10s-4k24.mp4"
+        f = shared / f"astris-overlay-grain-{name}-10s-4k24-v2.mp4"          # v2: the calmer, alternating grain
         if not f.exists():
             grain_loop(name, f)
-        shutil.copyfile(f, d / f.name)
+        shutil.copyfile(f, d / f.name.replace("-v2", ""))
         n += 1
     f = shared / "astris-overlay-dust-and-scratches-10s-4k24.mp4"
     if not f.exists():
