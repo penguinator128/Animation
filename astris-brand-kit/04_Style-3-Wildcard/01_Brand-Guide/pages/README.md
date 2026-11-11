@@ -16,7 +16,7 @@ Every page of the brand guide as a PNG (2339 x 1654 px, the A4 page at 200 dpi).
 | `astris-wildcard-brand-guide-page-07-grain.png` | 1.3 MB | 2339 x 1654 px |
 | `astris-wildcard-brand-guide-page-08-the-logo.png` | 1.0 MB | 2339 x 1654 px |
 | `astris-wildcard-brand-guide-page-09-layout.png` | 1.4 MB | 2339 x 1654 px |
-| `astris-wildcard-brand-guide-page-10-motion-and-sound.png` | 1.6 MB | 2339 x 1654 px |
+| `astris-wildcard-brand-guide-page-10-motion-and-sound.png` | 1.5 MB | 2339 x 1654 px |
 | `astris-wildcard-brand-guide-page-11-in-premiere.png` | 1.0 MB | 2339 x 1654 px |
 | `astris-wildcard-brand-guide-page-12-where-things-are.png` | 1.0 MB | 2339 x 1654 px |
 

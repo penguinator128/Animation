@@ -338,6 +338,11 @@ def main():
     for d, key in ((KIT / k, v) for k, v in STYLE_DIRS.items()):
         style_readme(d, key)
     large_files(cache)
+    tree = walk()                                                 # again, so the READMEs just written are listed too
+    for d, (files, _) in tree.items():
+        for f in files:
+            if f not in cache:
+                cache[f] = details(f)
     count, total = manifest(tree, cache)
     print(f"{n} READMEs written, MANIFEST.md lists {count} files ({human(total)})")
 

@@ -7,11 +7,11 @@ Three lower-third designs, 5 s each, transparent (ProRes 4444 .mov), plus a stil
 
 | File | Size | Details |
 |---|---|---|
-| `astris-wildcard-lower-third-1-bar-5s-4k24-prores4444.mov` | 24.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-wildcard-lower-third-1-bar-5s-4k24-prores4444.mov` | 24.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `astris-wildcard-lower-third-1-bar-still-3840x2160-transparent.png` | 81.9 KB | 3840 x 2160 px, transparent |
-| `astris-wildcard-lower-third-2-line-5s-4k24-prores4444.mov` | 31.6 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-wildcard-lower-third-2-line-5s-4k24-prores4444.mov` | 31.9 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `astris-wildcard-lower-third-2-line-still-3840x2160-transparent.png` | 93.5 KB | 3840 x 2160 px, transparent |
-| `astris-wildcard-lower-third-3-stack-5s-4k24-prores4444.mov` | 23.5 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `astris-wildcard-lower-third-3-stack-still-3840x2160-transparent.png` | 84.4 KB | 3840 x 2160 px, transparent |
+| `astris-wildcard-lower-third-3-stack-5s-4k24-prores4444.mov` | 24.2 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-wildcard-lower-third-3-stack-still-3840x2160-transparent.png` | 83.0 KB | 3840 x 2160 px, transparent |
 
 Up one level: [05_Premiere-Assets](../README.md)

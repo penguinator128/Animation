@@ -7,17 +7,17 @@ The moving pieces, all 3840 x 2160 (4K), 24 fps, H.264 with sound (AAC, 48 kHz),
 
 | File | Size | Details |
 |---|---|---|
-| `astris-wildcard-end-card-10s-4k24.mp4` | 49.6 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-end-card-10s-4k24.mp4` | 44.8 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-end-card-10s-4k24.wav` | 2.9 MB | 10.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-intro-a-pop-2s-4k24.mp4` | 15.8 MB | 2.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-intro-a-pop-2s-4k24.mp4` | 21.3 MB | 2.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-intro-a-pop-2s-4k24.wav` | 576.0 KB | 2.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-intro-b-type-4s-4k24.mp4` | 28.4 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-intro-b-type-4s-4k24.mp4` | 21.1 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-intro-b-type-4s-4k24.wav` | 1.2 MB | 4.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-intro-c-slow-7s-4k24.mp4` | 44.2 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-intro-c-slow-7s-4k24.mp4` | 29.5 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-intro-c-slow-7s-4k24.wav` | 2.0 MB | 7.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-title-logo-5s-4k24.mp4` | 26.2 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-title-logo-5s-4k24.mp4` | 28.9 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-title-logo-5s-4k24.wav` | 1.4 MB | 5.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-title-logo-alpha-5s-4k24-prores4444.mov` | 44.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `astris-wildcard-title-logo-alpha-5s-4k24-prores4444.mov` | 46.4 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
 | `astris-wildcard-title-logo-alpha-5s-4k24.wav` | 1.4 MB | 5.0 s, 48 kHz, 24-bit, stereo |
 
 Up one level: [04_Style-3-Wildcard](../README.md)

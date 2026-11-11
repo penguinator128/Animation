@@ -13,6 +13,6 @@ The brand guide for this style: one A4 landscape PDF, and a picture of every pag
 
 | File | Size | Details |
 |---|---|---|
-| `astris-yellow-brand-guide-a4-landscape.pdf` | 15.0 MB | 12 pages, 297 x 210 mm |
+| `astris-yellow-brand-guide-a4-landscape.pdf` | 14.8 MB | 12 pages, 297 x 210 mm |
 
 Up one level: [03_Style-2-Yellow](../README.md)

@@ -7,11 +7,11 @@ Three lower-third designs, 5 s each, transparent (ProRes 4444 .mov), plus a stil
 
 | File | Size | Details |
 |---|---|---|
-| `astris-yellow-lower-third-1-bar-5s-4k24-prores4444.mov` | 22.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-yellow-lower-third-1-bar-5s-4k24-prores4444.mov` | 23.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `astris-yellow-lower-third-1-bar-still-3840x2160-transparent.png` | 70.7 KB | 3840 x 2160 px, transparent |
-| `astris-yellow-lower-third-2-line-5s-4k24-prores4444.mov` | 24.7 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-yellow-lower-third-2-line-5s-4k24-prores4444.mov` | 24.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `astris-yellow-lower-third-2-line-still-3840x2160-transparent.png` | 71.2 KB | 3840 x 2160 px, transparent |
-| `astris-yellow-lower-third-3-stack-5s-4k24-prores4444.mov` | 22.2 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `astris-yellow-lower-third-3-stack-still-3840x2160-transparent.png` | 83.9 KB | 3840 x 2160 px, transparent |
+| `astris-yellow-lower-third-3-stack-5s-4k24-prores4444.mov` | 22.9 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `astris-yellow-lower-third-3-stack-still-3840x2160-transparent.png` | 82.3 KB | 3840 x 2160 px, transparent |
 
 Up one level: [05_Premiere-Assets](../README.md)

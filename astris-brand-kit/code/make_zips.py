@@ -11,7 +11,7 @@ merch / everything else), and each group is packed into parts of up to 95 MB. A 
 
     python3 code/make_zips.py
 """
-import hashlib
+import os
 import shutil
 import sys
 import zipfile
@@ -65,7 +65,8 @@ def pack(files):
 
 
 def write_zip(path, files):
-    with zipfile.ZipFile(path, "w", allowZip64=False) as z:
+    tmp = path.with_suffix(".tmp")                      # written aside, then swapped in, so old links never see a half-written file
+    with zipfile.ZipFile(tmp, "w", allowZip64=False) as z:
         for f in files:
             info = zipfile.ZipInfo("astris-brand-kit/" + str(f.relative_to(KIT)).replace("\\", "/"), STAMP)
             info.external_attr = 0o644 << 16
@@ -75,8 +76,17 @@ def write_zip(path, files):
             else:
                 info.compress_type = zipfile.ZIP_DEFLATED
                 z.writestr(info, f.read_bytes(), compresslevel=9)
+    tmp.replace(path)
     assert path.stat().st_size < 100_000_000, f"{path.name} is over 100 MB"
     return path
+
+
+def place(src, dst):
+    """The same part under another name: a hard link where the disk allows it (no extra space), a copy otherwise."""
+    try:
+        os.link(src, dst)
+    except OSError:
+        shutil.copyfile(src, dst)
 
 
 def main():
@@ -126,7 +136,7 @@ def main():
         total = 0
         for i, n in enumerate(names, 1):
             dst = d / (f"{setname}.zip" if len(names) == 1 else f"{setname}-part-{i:02d}-of-{len(names):02d}.zip")
-            shutil.copyfile(built[n], dst)
+            place(built[n], dst)
             total += dst.stat().st_size
         rows.append((setname, len(names), total))
         print(f"{setname}: {len(names)} part(s), {total / 1e6:.0f} MB", flush=True)

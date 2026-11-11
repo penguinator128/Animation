@@ -7,17 +7,17 @@ The moving pieces, all 3840 x 2160 (4K), 24 fps, H.264 with sound (AAC, 48 kHz),
 
 | File | Size | Details |
 |---|---|---|
-| `astris-yellow-end-card-10s-4k24.mp4` | 64.1 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-end-card-10s-4k24.mp4` | 47.6 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-end-card-10s-4k24.wav` | 2.9 MB | 10.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-intro-a-pop-2s-4k24.mp4` | 17.0 MB | 0.0 s |
+| `astris-yellow-intro-a-pop-2s-4k24.mp4` | 17.0 MB | 2.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-intro-a-pop-2s-4k24.wav` | 576.0 KB | 2.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-intro-b-type-4s-4k24.mp4` | 3.9 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-intro-b-type-4s-4k24.mp4` | 19.8 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-intro-b-type-4s-4k24.wav` | 1.2 MB | 4.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-intro-c-slow-7s-4k24.mp4` | 58.2 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-intro-c-slow-7s-4k24.mp4` | 26.1 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-intro-c-slow-7s-4k24.wav` | 2.0 MB | 7.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-title-logo-5s-4k24.mp4` | 21.6 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-title-logo-5s-4k24.mp4` | 20.0 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-title-logo-5s-4k24.wav` | 1.4 MB | 5.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-title-logo-alpha-5s-4k24-prores4444.mov` | 26.1 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `astris-yellow-title-logo-alpha-5s-4k24-prores4444.mov` | 26.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
 | `astris-yellow-title-logo-alpha-5s-4k24.wav` | 1.4 MB | 5.0 s, 48 kHz, 24-bit, stereo |
 
 Up one level: [03_Style-2-Yellow](../README.md)

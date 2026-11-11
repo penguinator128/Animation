@@ -7,13 +7,13 @@ The clapperboard: a transparent PNG (open and closed, 4096 and 1024 px), a still
 
 | File | Size | Details |
 |---|---|---|
-| `astris-wildcard-clapperboard-clap-3s-4k24.mp4` | 32.0 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-clapperboard-clap-3s-4k24.mp4` | 35.6 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-clapperboard-clap-3s-4k24.wav` | 864.0 KB | 3.0 s, 48 kHz, 24-bit, stereo |
-| `astris-wildcard-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 42.0 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `astris-wildcard-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 42.8 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
 | `astris-wildcard-clapperboard-closed-transparent-1024.png` | 111.5 KB | 1024 x 820 px, transparent |
 | `astris-wildcard-clapperboard-closed-transparent-4096.png` | 734.0 KB | 4096 x 3282 px, transparent |
-| `astris-wildcard-clapperboard-on-colour-3840x2160.png` | 7.2 MB | 3840 x 2160 px |
-| `astris-wildcard-clapperboard-open-transparent-1024.png` | 129.9 KB | 1024 x 1164 px, transparent |
-| `astris-wildcard-clapperboard-open-transparent-4096.png` | 837.7 KB | 4096 x 4655 px, transparent |
+| `astris-wildcard-clapperboard-on-colour-3840x2160.png` | 7.1 MB | 3840 x 2160 px |
+| `astris-wildcard-clapperboard-open-transparent-1024.png` | 129.1 KB | 1024 x 1164 px, transparent |
+| `astris-wildcard-clapperboard-open-transparent-4096.png` | 829.0 KB | 4096 x 4655 px, transparent |
 
 Up one level: [08_Film-and-Paperwork](../README.md)

@@ -185,12 +185,16 @@ def main():
     # ---- 9. each style has the same structure --------------------------------------------------------------------------
     shapes = {}
     for k, d in STYLES.items():
-        shapes[k] = sorted(re.sub(rf"astris-{k}-", "astris-STYLE-", str(p.relative_to(KIT / d))) for p in (KIT / d).rglob("*") if p.is_file() and p.name != ".DS_Store")
+        # merch files are named after the garment colour, which differs by style on purpose (on-red, on-yellow, on-blue ...)
+        shapes[k] = sorted(re.sub(r"-(on-)?(red|yellow|black|cream|blue|natural)-(\d+mm|235x160mm|illustration)", r"-\1COLOUR-\3",
+                                  re.sub(rf"astris-{k}-", "astris-STYLE-", str(p.relative_to(KIT / d))))
+                           for p in (KIT / d).rglob("*") if p.is_file() and p.name != ".DS_Store")
     base = set(shapes["red"])
     for k in ("yellow", "wildcard"):
         diff = (base ^ set(shapes[k]))
-        # the textures folder legitimately differs (the risograph style has ink floods instead of field / dark)
-        diff = {x for x in diff if "texture-" not in x}
+        # the textures folder legitimately differs (the risograph style has ink floods instead of field / dark),
+        # and each style's tactile sounds are its own on purpose
+        diff = {x for x in diff if "texture-" not in x and "06_Sound/tactile/" not in x}
         for x in sorted(diff)[:10]:
             bad(f"structure differs between red and {k}: {x}")
     report = ["ASTRIS brand kit: final checks", "", f"{len(all_files)} files, {total / 1e9:.2f} GB", ""] + notes + [""]

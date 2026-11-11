@@ -7,13 +7,13 @@ The clapperboard: a transparent PNG (open and closed, 4096 and 1024 px), a still
 
 | File | Size | Details |
 |---|---|---|
-| `astris-red-clapperboard-clap-3s-4k24.mp4` | 15.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-red-clapperboard-clap-3s-4k24.mp4` | 20.9 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-red-clapperboard-clap-3s-4k24.wav` | 864.0 KB | 3.0 s, 48 kHz, 24-bit, stereo |
-| `astris-red-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 29.1 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `astris-red-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 31.2 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
 | `astris-red-clapperboard-closed-transparent-1024.png` | 98.9 KB | 1024 x 813 px, transparent |
 | `astris-red-clapperboard-closed-transparent-4096.png` | 647.0 KB | 4096 x 3252 px, transparent |
-| `astris-red-clapperboard-on-colour-3840x2160.png` | 7.3 MB | 3840 x 2160 px |
-| `astris-red-clapperboard-open-transparent-1024.png` | 120.7 KB | 1024 x 1156 px, transparent |
-| `astris-red-clapperboard-open-transparent-4096.png` | 754.5 KB | 4096 x 4625 px, transparent |
+| `astris-red-clapperboard-on-colour-3840x2160.png` | 7.1 MB | 3840 x 2160 px |
+| `astris-red-clapperboard-open-transparent-1024.png` | 120.2 KB | 1024 x 1156 px, transparent |
+| `astris-red-clapperboard-open-transparent-4096.png` | 741.1 KB | 4096 x 4625 px, transparent |
 
 Up one level: [08_Film-and-Paperwork](../README.md)

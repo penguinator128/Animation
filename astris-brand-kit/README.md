@@ -92,40 +92,44 @@ No single file is larger than 100 MB. The zips in `downloads/` are split into pa
 <!-- large-files:start -->
 ## Large files
 
-These 31 files are 20 MB or more (985.8 MB together). All of them are stored with Git LFS, and every one is under 100 MB.
+These 35 files are 20 MB or more (1.1 GB together). All of them are stored with Git LFS, and every one is under 100 MB.
 The zip parts in `downloads/` are up to 95 MB each.
 
 | File | Size | Details |
 |---|---|---|
-| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-end-card-10s-4k24.mp4` | 64.1 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-intro-c-slow-7s-4k24.mp4` | 58.2 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-end-card-10s-4k24.mp4` | 49.6 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-title-logo-alpha-5s-4k24-prores4444.mov` | 44.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
-| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-intro-c-slow-7s-4k24.mp4` | 44.2 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `02_Style-1-Red/04_Intros-and-Video/astris-red-end-card-10s-4k24.mp4` | 43.2 MB | 0.0 s |
-| `04_Style-3-Wildcard/08_Film-and-Paperwork/clapperboard/astris-wildcard-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 42.0 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-end-card-10s-4k24.mp4` | 47.6 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-title-logo-alpha-5s-4k24-prores4444.mov` | 46.4 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-end-card-10s-4k24.mp4` | 44.8 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `03_Style-2-Yellow/08_Film-and-Paperwork/presents-card/astris-yellow-presents-card-3s-4k24.mp4` | 43.2 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `02_Style-1-Red/04_Intros-and-Video/astris-red-end-card-10s-4k24.mp4` | 43.2 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/08_Film-and-Paperwork/clapperboard/astris-wildcard-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 42.8 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `04_Style-3-Wildcard/08_Film-and-Paperwork/presents-card/astris-wildcard-presents-card-3s-4k24.mp4` | 42.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `04_Style-3-Wildcard/05_Premiere-Assets/corner-bug/astris-wildcard-bug-10s-4k24-prores4444.mov` | 37.7 MB | 10.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `02_Style-1-Red/08_Film-and-Paperwork/presents-card/astris-red-presents-card-3s-4k24.mp4` | 36.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/08_Film-and-Paperwork/presents-card/astris-wildcard-presents-card-dark-3s-4k24.mp4` | 35.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/08_Film-and-Paperwork/clapperboard/astris-wildcard-clapperboard-clap-3s-4k24.mp4` | 35.6 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `03_Style-2-Yellow/08_Film-and-Paperwork/clapperboard/astris-yellow-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 33.6 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
 | `03_Style-2-Yellow/05_Premiere-Assets/corner-bug/astris-yellow-bug-10s-4k24-prores4444.mov` | 33.0 MB | 10.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `03_Style-2-Yellow/08_Film-and-Paperwork/clapperboard/astris-yellow-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 32.5 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
-| `04_Style-3-Wildcard/08_Film-and-Paperwork/clapperboard/astris-wildcard-clapperboard-clap-3s-4k24.mp4` | 32.0 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-2-line-5s-4k24-prores4444.mov` | 31.9 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `02_Style-1-Red/05_Premiere-Assets/corner-bug/astris-red-bug-10s-4k24-prores4444.mov` | 31.8 MB | 10.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-2-line-5s-4k24-prores4444.mov` | 31.6 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `02_Style-1-Red/08_Film-and-Paperwork/clapperboard/astris-red-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 31.2 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-intro-c-slow-7s-4k24.mp4` | 29.5 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `02_Style-1-Red/04_Intros-and-Video/astris-red-title-logo-alpha-5s-4k24-prores4444.mov` | 29.4 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
-| `02_Style-1-Red/08_Film-and-Paperwork/clapperboard/astris-red-clapperboard-clap-alpha-3s-4k24-prores4444.mov` | 29.1 MB | 3.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
-| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-intro-b-type-4s-4k24.mp4` | 28.4 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `04_Style-3-Wildcard/08_Film-and-Paperwork/presents-card/astris-wildcard-presents-card-3s-4k24.mp4` | 27.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-title-logo-5s-4k24.mp4` | 26.2 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-title-logo-alpha-5s-4k24-prores4444.mov` | 26.1 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
-| `03_Style-2-Yellow/08_Film-and-Paperwork/presents-card/astris-yellow-presents-card-3s-4k24.mp4` | 25.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-2-line-5s-4k24-prores4444.mov` | 24.7 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-1-bar-5s-4k24-prores4444.mov` | 24.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `04_Style-3-Wildcard/08_Film-and-Paperwork/presents-card/astris-wildcard-presents-card-dark-3s-4k24.mp4` | 23.6 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-3-stack-5s-4k24-prores4444.mov` | 23.5 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-1-bar-5s-4k24-prores4444.mov` | 22.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-title-logo-5s-4k24.mp4` | 28.9 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-title-logo-alpha-5s-4k24-prores4444.mov` | 26.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent, sound 48 kHz |
+| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-intro-c-slow-7s-4k24.mp4` | 26.1 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-2-line-5s-4k24-prores4444.mov` | 24.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-1-bar-5s-4k24-prores4444.mov` | 24.8 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `04_Style-3-Wildcard/05_Premiere-Assets/lower-thirds/astris-wildcard-lower-third-3-stack-5s-4k24-prores4444.mov` | 24.2 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-1-bar-5s-4k24-prores4444.mov` | 23.3 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-3-stack-5s-4k24-prores4444.mov` | 22.9 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `03_Style-2-Yellow/08_Film-and-Paperwork/clapperboard/astris-yellow-clapperboard-clap-3s-4k24.mp4` | 22.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-1-bar-5s-4k24-prores4444.mov` | 22.4 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
 | `02_Style-1-Red/04_Intros-and-Video/astris-red-intro-c-slow-7s-4k24.mp4` | 22.4 MB | 7.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `03_Style-2-Yellow/05_Premiere-Assets/lower-thirds/astris-yellow-lower-third-3-stack-5s-4k24-prores4444.mov` | 22.2 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-1-bar-5s-4k24-prores4444.mov` | 21.9 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-title-logo-5s-4k24.mp4` | 21.6 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
-| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-3-stack-5s-4k24-prores4444.mov` | 21.4 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
-| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-2-line-5s-4k24-prores4444.mov` | 20.6 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-3-stack-5s-4k24-prores4444.mov` | 22.1 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-intro-a-pop-2s-4k24.mp4` | 21.3 MB | 2.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `04_Style-3-Wildcard/04_Intros-and-Video/astris-wildcard-intro-b-type-4s-4k24.mp4` | 21.1 MB | 4.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `02_Style-1-Red/08_Film-and-Paperwork/clapperboard/astris-red-clapperboard-clap-3s-4k24.mp4` | 20.9 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `02_Style-1-Red/05_Premiere-Assets/lower-thirds/astris-red-lower-third-2-line-5s-4k24-prores4444.mov` | 20.7 MB | 5.0 s, 3840 x 2160, 24 fps, ProRes 4444, transparent |
+| `03_Style-2-Yellow/04_Intros-and-Video/astris-yellow-title-logo-5s-4k24.mp4` | 20.0 MB | 5.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 <!-- large-files:end -->

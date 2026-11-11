@@ -13,6 +13,6 @@ The brand guide for this style: one A4 landscape PDF, and a picture of every pag
 
 | File | Size | Details |
 |---|---|---|
-| `astris-red-brand-guide-a4-landscape.pdf` | 12.9 MB | 12 pages, 297 x 210 mm |
+| `astris-red-brand-guide-a4-landscape.pdf` | 12.7 MB | 12 pages, 297 x 210 mm |
 
 Up one level: [02_Style-1-Red](../README.md)

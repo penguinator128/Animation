@@ -7,10 +7,10 @@
 
 | File | Size | Details |
 |---|---|---|
-| `astris-wildcard-presents-card-3840x2160.png` | 7.1 MB | 3840 x 2160 px |
-| `astris-wildcard-presents-card-3s-4k24.mp4` | 27.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-presents-card-3840x2160.png` | 7.0 MB | 3840 x 2160 px |
+| `astris-wildcard-presents-card-3s-4k24.mp4` | 42.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-wildcard-presents-card-3s-4k24.wav` | 864.0 KB | 3.0 s, 48 kHz, 24-bit, stereo |
 | `astris-wildcard-presents-card-dark-3840x2160.png` | 8.0 MB | 3840 x 2160 px |
-| `astris-wildcard-presents-card-dark-3s-4k24.mp4` | 23.6 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-wildcard-presents-card-dark-3s-4k24.mp4` | 35.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 
 Up one level: [08_Film-and-Paperwork](../README.md)

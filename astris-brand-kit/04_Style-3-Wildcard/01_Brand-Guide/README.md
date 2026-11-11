@@ -13,6 +13,6 @@ The brand guide for this style: one A4 landscape PDF, and a picture of every pag
 
 | File | Size | Details |
 |---|---|---|
-| `astris-wildcard-brand-guide-a4-landscape.pdf` | 11.9 MB | 12 pages, 297 x 210 mm |
+| `astris-wildcard-brand-guide-a4-landscape.pdf` | 11.8 MB | 12 pages, 297 x 210 mm |
 
 Up one level: [04_Style-3-Wildcard](../README.md)

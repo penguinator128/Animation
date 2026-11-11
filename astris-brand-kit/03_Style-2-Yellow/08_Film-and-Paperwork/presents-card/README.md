@@ -7,10 +7,10 @@
 
 | File | Size | Details |
 |---|---|---|
-| `astris-yellow-presents-card-3840x2160.png` | 7.4 MB | 3840 x 2160 px |
-| `astris-yellow-presents-card-3s-4k24.mp4` | 25.8 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-presents-card-3840x2160.png` | 7.2 MB | 3840 x 2160 px |
+| `astris-yellow-presents-card-3s-4k24.mp4` | 43.2 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-yellow-presents-card-3s-4k24.wav` | 864.0 KB | 3.0 s, 48 kHz, 24-bit, stereo |
-| `astris-yellow-presents-card-dark-3840x2160.png` | 6.4 MB | 3840 x 2160 px |
-| `astris-yellow-presents-card-dark-3s-4k24.mp4` | 13.7 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
+| `astris-yellow-presents-card-dark-3840x2160.png` | 6.3 MB | 3840 x 2160 px |
+| `astris-yellow-presents-card-dark-3s-4k24.mp4` | 13.1 MB | 3.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 
 Up one level: [08_Film-and-Paperwork](../README.md)

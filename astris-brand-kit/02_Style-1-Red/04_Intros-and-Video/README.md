@@ -7,7 +7,7 @@ The moving pieces, all 3840 x 2160 (4K), 24 fps, H.264 with sound (AAC, 48 kHz),
 
 | File | Size | Details |
 |---|---|---|
-| `astris-red-end-card-10s-4k24.mp4` | 43.2 MB | 0.0 s |
+| `astris-red-end-card-10s-4k24.mp4` | 43.2 MB | 10.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-red-end-card-10s-4k24.wav` | 2.9 MB | 10.0 s, 48 kHz, 24-bit, stereo |
 | `astris-red-intro-a-pop-2s-4k24.mp4` | 15.5 MB | 2.0 s, 3840 x 2160, 24 fps, H.264, sound 48 kHz |
 | `astris-red-intro-a-pop-2s-4k24.wav` | 576.0 KB | 2.0 s, 48 kHz, 24-bit, stereo |
