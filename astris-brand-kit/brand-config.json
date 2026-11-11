@@ -7,29 +7,28 @@
     "first_word": "ASTRIS",
     "second_word": "PRODUCTIONS",
     "presents_line": "ASTRIS PRODUCTIONS presents",
-    "about_short": "[PLACEHOLDER: one or two sentences about Astris Productions. Who you are, what kind of films you make, where you are based.]",
-    "about_long": "[PLACEHOLDER: a longer paragraph for the press kit and brand guide. How Astris started, what you care about, what you are working on now.]",
-    "end_card_line": "more stories this way."
+    "about_short": "Astris Productions is a Canberra-based production company focused on deep, meaningful storytelling and expressive cinematography. We create films designed to draw audiences into the story and stay with them afterwards.",
+    "about_long": "Based in Canberra, Australia, Astris Productions is a film production company with a passion for thoughtful storytelling and the visual craft of cinema. We aim to create films that explore meaningful ideas and human experiences, bringing each story to life through intentional, expressive cinematography. From the script to the screen, we care about creating work that feels immersive, considered, and emotionally resonant."
   },
 
   "logo_version": "geometric",
 
   "person": {
-    "name": "[YOUR NAME]",
-    "role": "[YOUR ROLE]",
-    "email": "[EMAIL ADDRESS]",
-    "phone": "[PHONE NUMBER]",
-    "website": "[WEBSITE]",
-    "location": "[CITY, STATE]",
-    "address": "[POSTAL ADDRESS]",
-    "abn": "[ABN]"
+    "name": "Josh Broagn",
+    "role": "Director, Cinematogrpher, DOP, Editor",
+    "email": "astris.a.productions@gmail.com",
+    "phone": "",
+    "website": "https://astrisfinal.vercel.app/",
+    "location": "Canberra, Australia",
+    "address": "",
+    "abn": ""
   },
 
   "social": {
     "youtube": "[@YOUTUBE HANDLE]",
-    "instagram": "[@INSTAGRAM HANDLE]",
-    "tiktok": "[@TIKTOK HANDLE]",
-    "letterboxd": "[LETTERBOXD NAME]"
+    "instagram": "",
+    "tiktok": "",
+    "letterboxd": ""
   },
 
   "invoice": {
@@ -41,11 +40,11 @@
   },
 
   "films_note": "films.txt is the list the posters are made from. If films.txt is deleted, this list is used instead.",
-  "films": ["Two Face", "Charlie", "Ocean (working title)", "The Voice"],
+  "films": ["Two Face", "Charlie", "Ocean", "The Right Way Round"],
 
   "taglines": [
-    "welcome in.",
-    "pull up a chair.",
+    "stay for the credits.",
+    "bring snacks.",
     "stories, slowly.",
     "made with friends.",
     "small films, big feelings.",
@@ -59,7 +58,7 @@
   ],
 
   "lower_thirds": [
-    {"name": "[YOUR NAME]", "title": "[YOUR ROLE]"},
+    {"name": "Josh", "title": "Director, DOP, Editor"},
     {"name": "[GUEST NAME]", "title": "[GUEST TITLE]"},
     {"name": "[CREW NAME]", "title": "[CREW ROLE]"}
   ],
