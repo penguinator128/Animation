@@ -133,14 +133,18 @@ class Clip:
                 a = a * (1 - smoothstep(edge - soft, edge + soft, c))
         if op < 1:
             a = a * op
-        dx, dy, sc = stt.get("dx", 0.0), stt.get("dy", 0.0), stt.get("s", 1.0)
-        if abs(sc - 1) > 1e-4 or abs(dx) > 0.01 or abs(dy) > 0.01:
+        dx, dy, sc, rot = stt.get("dx", 0.0), stt.get("dy", 0.0), stt.get("s", 1.0), stt.get("r", 0.0)
+        if abs(sc - 1) > 1e-4 or abs(dx) > 0.01 or abs(dy) > 0.01 or abs(rot) > 1e-3:
             hh, ww = a.shape
-            cx, cy = stt.get("cx", x0 + ww / 2), stt.get("cy", y0 + hh / 2)        # scale about this point (frame coords)
-            nx0 = int(math.floor(cx + (x0 - cx) * sc + dx)) - 1
-            ny0 = int(math.floor(cy + (y0 - cy) * sc + dy)) - 1
-            nw, nh = int(math.ceil(ww * sc)) + 3, int(math.ceil(hh * sc)) + 3
-            M = np.float32([[sc, 0, cx + (x0 - cx) * sc + dx - nx0], [0, sc, cy + (y0 - cy) * sc + dy - ny0]])
+            cx, cy = stt.get("cx", x0 + ww / 2), stt.get("cy", y0 + hh / 2)        # scale / turn about this point (frame coords)
+            co, si = sc * math.cos(math.radians(rot)), sc * math.sin(math.radians(rot))   # r = degrees, clockwise on screen
+            # where the layer's corners land, to size the new patch
+            px = [cx + co * (x0 + u - cx) - si * (y0 + v - cy) + dx for u, v in ((0, 0), (ww, 0), (0, hh), (ww, hh))]
+            py = [cy + si * (x0 + u - cx) + co * (y0 + v - cy) + dy for u, v in ((0, 0), (ww, 0), (0, hh), (ww, hh))]
+            nx0, ny0 = int(math.floor(min(px))) - 1, int(math.floor(min(py))) - 1
+            nw, nh = int(math.ceil(max(px))) - nx0 + 2, int(math.ceil(max(py))) - ny0 + 2
+            M = np.float32([[co, -si, cx + co * (x0 - cx) - si * (y0 - cy) + dx - nx0],
+                            [si, co, cy + si * (x0 - cx) + co * (y0 - cy) + dy - ny0]])
             a = cv2.warpAffine(a, M, (nw, nh), flags=cv2.INTER_LINEAR)
             x0, y0 = nx0, ny0
         # clip to the frame
@@ -168,6 +172,7 @@ class Clip:
         sch = self.art.sch
         if self.transparent:
             return self._frame_alpha(S)
+        self._shift = self.walk[i % len(self.walk)] if self.live_grain else (0, 0)
         black = g.get("black", 0.0)                     # 1 = the style's dark neutral instead of the field
         if black >= 1.0:
             img = np.empty((self.H, self.W, 3), np.float32)
@@ -243,7 +248,12 @@ class Clip:
                     dx, dy = self.misreg
                     M = np.float32([[1, 0, dx * self.art.s], [0, 1, dy * self.art.s]])
                     a = cv2.warpAffine(a, M, (a.shape[1], a.shape[0]), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
-                a = a * self.dens[name][sl] * self.mott[name][sl]
+                mott = self.mott[name]
+                if self.flood and self.live_grain:
+                    # a full flood of ink: its speckle travels with the live grain, so the whole texture moves as one
+                    # (otherwise a still speckle under moving grain makes a 3 s clip weigh 100 MB)
+                    mott = np.roll(np.roll(mott, int(self._shift[0]), 0), int(self._shift[1]), 1)
+                a = a * self.dens[name][sl] * mott[sl]
                 reg *= 1.0 - a[..., None] * (1.0 - sch[name][None, None, :])
             for sl2, a, col in extra:
                 r2 = img[sl2]
