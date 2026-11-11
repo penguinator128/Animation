@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ASTRIS PRODUCTIONS (Wildcard (Risograph) style preview)</title>
+<link rel="icon" href="favicons/favicon.ico" sizes="48x48">
+<link rel="icon" href="favicons/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicons/apple-touch-icon-180.png">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* The brand fonts ship with the kit (code/fonts). On a real site, host them yourself or load them from Google Fonts. */
+  @font-face { font-family: "Anton"; src: url("../../code/fonts/anton-400.ttf"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Space Grotesk"; src: url("../../code/fonts/space-grotesk-400.ttf"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Space Grotesk"; src: url("../../code/fonts/space-grotesk-500.ttf"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: "Space Grotesk"; src: url("../../code/fonts/space-grotesk-700.ttf"); font-weight: 700; font-display: swap; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--astris-bg); color: var(--astris-fg); font-family: var(--astris-font-text); font-size: var(--astris-body); line-height: var(--astris-leading-body); }
+  body::after { content: ""; position: fixed; inset: 0; background: url("astris-grain-512.png"); mix-blend-mode: overlay; opacity: 0.75; pointer-events: none; z-index: 10; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: var(--astris-space-4) var(--astris-space-5); }
+  nav ul { display: flex; gap: var(--astris-space-5); list-style: none; margin: 0; padding: 0; font-weight: 500; letter-spacing: 0.14em; font-size: var(--astris-small); }
+  a { color: inherit; text-decoration: none; }
+  .hero { text-align: center; padding: var(--astris-space-7) var(--astris-space-4) var(--astris-space-6); }
+  .hero h1 { font-family: var(--astris-font-display); font-weight: 400; font-size: var(--astris-hero); line-height: var(--astris-leading-display); letter-spacing: var(--astris-tracking-display); margin: 0; text-shadow: 0.03em 0.027em 0 #FF5E4D; }
+  .hero p { font-family: var(--astris-font-display); letter-spacing: var(--astris-tracking-small); font-size: clamp(0.8rem, 1.6vw, 1.3rem); margin: var(--astris-space-3) 0 var(--astris-space-5); }
+  .button { display: inline-block; background: var(--astris-fg); color: var(--astris-bg); font-weight: 700; letter-spacing: 0.1em; padding: 0.95em 2.2em; border-radius: var(--astris-radius-pill); transition: transform var(--astris-motion-quick) var(--astris-motion-ease); }
+  .button:hover { transform: translateY(-2px); }
+  section { padding: var(--astris-space-6) var(--astris-space-5); }
+  h2 { font-family: var(--astris-font-display); font-weight: 400; font-size: var(--astris-h2); letter-spacing: var(--astris-tracking-display); margin: 0 0 var(--astris-space-4); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--astris-space-4); }
+  .still { aspect-ratio: 16 / 9; border: 2px dashed currentColor; border-radius: var(--astris-radius-medium); display: grid; place-items: center; font-size: var(--astris-small); letter-spacing: 0.08em; opacity: 0.85; }
+  .card h3 { font-family: var(--astris-font-display); font-weight: 400; font-size: 1.9rem; margin: var(--astris-space-3) 0 0; line-height: 1; }
+  .card p { margin: var(--astris-space-2) 0 0; font-size: var(--astris-small); }
+  .panel { background: var(--astris-surface); color: var(--astris-on-surface); }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: var(--astris-space-3); }
+  .swatch { border-radius: var(--astris-radius-medium); padding: var(--astris-space-4) var(--astris-space-3); min-height: 130px; display: flex; flex-direction: column; justify-content: flex-end; border: 1px solid rgba(0,0,0,0.08); }
+  .swatch span { font-size: var(--astris-small); letter-spacing: 0.08em; }
+  .type-row { display: grid; grid-template-columns: 9rem 1fr; gap: var(--astris-space-3); align-items: baseline; border-top: 1px solid rgba(0,0,0,0.12); padding: var(--astris-space-3) 0; }
+  .type-row small { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.7rem; }
+  footer { background: var(--astris-dark); color: var(--astris-on-dark); padding: var(--astris-space-5); display: flex; flex-wrap: wrap; gap: var(--astris-space-4); justify-content: space-between; align-items: center; font-size: var(--astris-small); }
+  footer .name { font-family: var(--astris-font-display); font-size: 1.6rem; }
+</style>
+</head>
+<body>
+  <nav>
+    <a href="#"><svg class="logo" viewBox="0 0 118.75 100" height="44" role="img" aria-label="ASTRIS PRODUCTIONS"><path fill="#2C46B8" fill-rule="evenodd" d="M0 100 L37.5 100 L62.5 50 L43.75 12.5 Z M46.51 23.47 L46.91 22.67 L44.91 18.68 L43.32 21.88 Z M40.19 28.12 L43.39 29.72 L44.98 26.53 L41.79 24.93 Z M37.07 34.38 L40.26 35.97 L41.86 32.78 L38.66 31.18 Z M33.94 40.62 L37.14 42.22 L38.73 39.03 L35.54 37.43 Z M30.82 46.88 L34.01 48.47 L35.61 45.28 L32.41 43.68 Z M27.69 53.12 L30.89 54.72 L32.48 51.53 L29.29 49.93 Z M24.57 59.38 L27.76 60.97 L29.36 57.78 L26.16 56.18 Z M21.44 65.62 L24.64 67.22 L26.23 64.03 L23.04 62.43 Z M18.32 71.88 L21.51 73.47 L23.11 70.28 L19.91 68.68 Z M15.19 78.12 L18.39 79.72 L19.98 76.53 L16.79 74.93 Z M12.07 84.38 L15.26 85.97 L16.86 82.78 L13.66 81.18 Z M8.94 90.62 L12.14 92.22 L13.73 89.03 L10.54 87.43 Z M10.61 95.28 L7.41 93.68 L5.82 96.88 L9.81 96.88 Z M59.01 48.47 L59.41 47.67 L57.41 43.68 L55.82 46.88 Z M52.69 53.12 L55.89 54.72 L57.48 51.53 L54.29 49.93 Z M49.57 59.38 L52.76 60.97 L54.36 57.78 L51.16 56.18 Z M46.44 65.62 L49.64 67.22 L51.23 64.03 L48.04 62.43 Z M43.32 71.88 L46.51 73.47 L48.11 70.28 L44.91 68.68 Z M40.19 78.12 L43.39 79.72 L44.98 76.53 L41.79 74.93 Z M37.07 84.38 L40.26 85.97 L41.86 82.78 L38.66 81.18 Z M33.94 90.62 L37.14 92.22 L38.73 89.03 L35.54 87.43 Z M35.61 95.28 L32.41 93.68 L30.82 96.88 L34.81 96.88 Z M43.75 0 L68.75 0 L118.75 100 L93.75 100 Z"/></svg></a>
+    <ul><li><a href="#films">films</a></li><li><a href="#about">about</a></li><li><a href="#contact">contact</a></li></ul>
+  </nav>
+  <header class="hero">
+    <h1>astris productions.</h1>
+    <p>made with friends.</p>
+    <a class="button" href="#films">watch the films</a>
+  </header>
+  <section id="films">
+    <h2>films.</h2>
+    <div class="cards">
+      <article class="card"><div class="still">[a still from the film]</div><h3>two face.</h3><p>[one line about it]</p></article>
+      <article class="card"><div class="still">[a still from the film]</div><h3>charlie.</h3><p>[one line about it]</p></article>
+      <article class="card"><div class="still">[a still from the film]</div><h3>ocean.</h3><p>(working title) [one line about it]</p></article>
+      <article class="card"><div class="still">[a still from the film]</div><h3>the voice.</h3><p>[one line about it]</p></article>
+    </div>
+  </section>
+  <section id="about" class="panel">
+    <h2>about.</h2>
+    <p style="max-width: 46rem">[PLACEHOLDER: a longer paragraph for the press kit and brand guide. How Astris started, what you care about, what you are working on now.]</p>
+    <h2 style="margin-top: var(--astris-space-6)">colours.</h2>
+    <div class="swatches">
+      <div class="swatch" style="background:#2C46B8; color:#fff"><b>Ultramarine Ink</b><span>#2C46B8</span></div>
+      <div class="swatch" style="background:#FF5E4D; color:#111"><b>Hot Coral Ink</b><span>#FF5E4D</span></div>
+      <div class="swatch" style="background:#F1E8D6; color:#111"><b>Cream Paper</b><span>#F1E8D6</span></div>
+      <div class="swatch" style="background:#14182E; color:#fff"><b>Ink Blue-Black</b><span>#14182E</span></div>
+    </div>
+    <h2 style="margin-top: var(--astris-space-6)">type.</h2>
+    <div class="type-row"><small>Display</small><div style="font-family: var(--astris-font-display); font-size: var(--astris-h1); line-height: 1">Anton, for the big friendly lines.</div></div>
+    <div class="type-row"><small>Text 700</small><div style="font-weight: 700">Space Grotesk Bold, for labels and buttons.</div></div>
+    <div class="type-row"><small>Text 400</small><div>Space Grotesk Regular, for everything you read for more than a second.</div></div>
+    <div class="type-row"><small>Small</small><div style="font-size: var(--astris-small); letter-spacing: var(--astris-tracking-small); text-transform: uppercase">The very small supporting line</div></div>
+  </section>
+  <footer id="contact">
+    <span class="name">astris productions.</span>
+    <span>[EMAIL ADDRESS] &nbsp;&middot;&nbsp; [@YOUTUBE HANDLE] &nbsp;&middot;&nbsp; [@INSTAGRAM HANDLE]</span>
+  </footer>
+</body>
+</html>

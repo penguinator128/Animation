@@ -1,0 +1,19 @@
+{
+  "name": "ASTRIS PRODUCTIONS",
+  "short_name": "ASTRIS",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#C23A3A",
+  "background_color": "#C23A3A",
+  "display": "standalone"
+}

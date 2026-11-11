@@ -10,3 +10,6 @@
 *-4096x4096.png filter=lfs diff=lfs merge=lfs -text
 # full-frame 4K stills
 *-3840x2160.png filter=lfs diff=lfs merge=lfs -text
+# phone wallpapers and the bottle wrap artwork (full-bleed grain images)
+**/phone-wallpapers/*.png filter=lfs diff=lfs merge=lfs -text
+*-300dpi.png filter=lfs diff=lfs merge=lfs -text

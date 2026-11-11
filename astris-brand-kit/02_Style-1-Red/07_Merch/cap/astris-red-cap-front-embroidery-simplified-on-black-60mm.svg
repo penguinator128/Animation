@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60mm" height="50.526mm" viewBox="0 0 60 50.526">
+  <title>ASTRIS logo</title>
+  <desc>Sizes are real: 1 unit = 1 mm. Spot colours: #F4E3DA, #C23A3A.</desc>
+  <path id="logo-film-strip" fill="#C23A3A" fill-rule="evenodd" d="M0 50.526 L18.947 50.526 L31.579 25.263 L22.105 6.316 Z"/>
+  <path id="logo-bar" fill="#F4E3DA" fill-rule="evenodd" d="M22.105 0 L34.737 0 L60 50.526 L47.368 50.526 Z"/>
+</svg>

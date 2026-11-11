@@ -1,0 +1,45 @@
+/* ASTRIS PRODUCTIONS design tokens, Yellow style. Generated from brand-config.json by code/build.py web. */
+:root {
+  --astris-signature: #F2B705;   /* Golden Yellow */
+  --astris-light: #F2EBDD;   /* Warm Off-White */
+  --astris-dark: #141210;   /* Near Black */
+
+  --astris-bg: #F2B705;
+  --astris-fg: #141210;
+  --astris-muted: #141210;
+  --astris-surface: #F2EBDD;
+  --astris-on-surface: #141210;
+  --astris-accent: #141210;
+  --astris-on-accent: #F2B705;
+  --astris-dark: #141210;
+  --astris-on-dark: #F2B705;
+
+  --astris-font-display: "Anton", "League Gothic", Impact, "Arial Narrow", sans-serif;
+  --astris-font-text: "Inter", system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+
+  --astris-hero: clamp(3rem, 10vw, 9.5rem);
+  --astris-h1: clamp(2.4rem, 6vw, 5rem);
+  --astris-h2: clamp(1.6rem, 3.4vw, 2.6rem);
+  --astris-body: 1.0625rem;
+  --astris-small: 0.8125rem;
+  --astris-tracking-display: 0.012em;
+  --astris-tracking-small: 0.16em;
+  --astris-leading-display: 0.95;
+  --astris-leading-body: 1.55;
+
+  --astris-space-1: 0.25rem;
+  --astris-space-2: 0.5rem;
+  --astris-space-3: 1rem;
+  --astris-space-4: 1.5rem;
+  --astris-space-5: 2.5rem;
+  --astris-space-6: 4rem;
+  --astris-space-7: 6.5rem;
+  --astris-radius-small: 0.5rem;
+  --astris-radius-medium: 1rem;
+  --astris-radius-pill: 999px;
+  --astris-motion-quick: 120ms;
+  --astris-motion-normal: 240ms;
+  --astris-motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --astris-grain: 0.075;
+}
