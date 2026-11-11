@@ -56,8 +56,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* ---- the page layer ---- */
 #view { position: fixed; inset: 0; z-index: 10; overflow-y: auto; overflow-x: hidden; padding: 56px 56px 120px calc(var(--rail) + 40px); scrollbar-width: thin; scrollbar-color: var(--y) transparent; }
 body:not([data-page="home"]) #view { background: linear-gradient(90deg, rgba(11, 10, 9, .93) 0, rgba(11, 10, 9, .86) 45%, rgba(11, 10, 9, .8)); backdrop-filter: blur(18px) saturate(.8); }
-body[data-page="home"] #view { overflow: hidden; padding: 0; pointer-events: none; }
-body[data-page="home"] #view > * { pointer-events: auto; }
+body[data-page="home"] #view { padding: 0; }
 .rise { animation: rise .8s var(--ease) both; animation-delay: var(--d, 0ms); }
 @keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
 
@@ -66,31 +65,59 @@ body[data-page="home"] #view > * { pointer-events: auto; }
 #tape.go { animation: tape .85s cubic-bezier(.7, 0, .3, 1); }
 @keyframes tape { 0% { left: -70%; opacity: 1; } 100% { left: 130%; opacity: 1; } }
 
-/* ---- home ---- */
-.home { position: absolute; inset: 0; }
-.hero { position: absolute; left: calc(var(--rail) + 40px); bottom: 150px; max-width: calc(100% - var(--rail) - 80px); }
-.hero .eyebrow { color: var(--ink); text-shadow: 0 2px 16px rgba(0, 0, 0, .8); margin-bottom: 6px; }
-.hero h1 { font-size: clamp(96px, 17vw, 300px); line-height: .86; text-shadow: 0 8px 50px rgba(0, 0, 0, .55); }
-.slab { display: inline-block; background: var(--y); color: var(--k); transform: skewX(-26.565deg); padding: .02em .5em .02em .42em; margin: 12px 0 0 6px; }
-.slab span { display: block; transform: skewX(26.565deg); font-size: clamp(34px, 5.4vw, 92px); line-height: 1.08; }
-.hero .sub { margin-top: 22px; font-size: 17px; font-weight: 500; text-shadow: 0 2px 18px rgba(0, 0, 0, .9); max-width: 520px; }
-.hero .go { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
-.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 26px; border-radius: 40px; font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; transition: transform .3s var(--ease), background .25s, color .25s; }
+/* ---- home: a quiet first screen over the reel, then more as you scroll ---- */
+.hs { position: relative; height: 100vh; min-height: 560px; }
+.hero { position: absolute; left: calc(var(--rail) + 40px); bottom: 190px; max-width: calc(100% - var(--rail) - 80px); }
+.hero .eyebrow { color: var(--ink); text-shadow: 0 2px 16px rgba(0, 0, 0, .85); margin-bottom: 8px; }
+.hero h1 { font-size: clamp(54px, 7.5vw, 124px); line-height: .9; text-shadow: 0 6px 40px rgba(0, 0, 0, .6); }
+.slab { display: inline-block; background: var(--y); color: var(--k); transform: skewX(-26.565deg); padding: .02em .5em .02em .42em; margin: 10px 0 0 4px; }
+.slab span { display: block; transform: skewX(26.565deg); font-size: clamp(22px, 2.6vw, 42px); line-height: 1.1; }
+.hero .go { display: flex; gap: 22px; margin-top: 22px; align-items: center; flex-wrap: wrap; }
+.cue { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); text-shadow: 0 1px 12px #000; display: flex; align-items: center; gap: 10px; } .cue::after { content: ""; width: 1px; height: 34px; background: var(--y); animation: cue 1.8s ease-in-out infinite; transform-origin: top; }
+@keyframes cue { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 24px; border-radius: 40px; font-weight: 700; font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; transition: transform .3s var(--ease), background .25s, color .25s; }
 .btn.y { background: var(--y); color: var(--k); } .btn.o { border: 2px solid var(--ink); } .btn.y:hover, .btn.o:hover { transform: translateY(-3px); } .btn.o:hover { background: var(--ink); color: var(--k); }
-.slate { position: absolute; right: 40px; bottom: 126px; width: 290px; border: 2px solid var(--y); background: rgba(11, 10, 9, .72); backdrop-filter: blur(8px); padding: 14px 16px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; line-height: 2; }
-.slate .tc { font-family: var(--text); font-size: 28px; font-weight: 700; letter-spacing: .06em; color: var(--ink); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 12px; }
-.slate .rec { width: 12px; height: 12px; border-radius: 50%; background: #e5372c; animation: blink 1.4s steps(2) infinite; }
+.slate { position: absolute; right: 40px; bottom: 190px; border: 2px solid var(--y); background: rgba(11, 10, 9, .6); backdrop-filter: blur(8px); padding: 10px 14px; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; line-height: 1.8; }
+.slate .tc { font-size: 22px; font-weight: 700; letter-spacing: .06em; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 10px; }
+.slate .rec { width: 10px; height: 10px; border-radius: 50%; background: #e5372c; animation: blink 1.4s steps(2) infinite; }
 @keyframes blink { 50% { opacity: .15; } }
-.slate small { display: block; color: var(--dim); font-size: 11px; }
-.ribbon { position: absolute; left: 0; right: 0; bottom: 0; height: 92px; background: rgba(8, 7, 6, .9); border-top: 1px solid var(--line); overflow: hidden; }
-.ribbon::before, .ribbon::after { content: ""; position: absolute; left: 0; right: 0; height: 9px; background: repeating-linear-gradient(90deg, rgba(242, 235, 221, .22) 0 14px, transparent 14px 30px); z-index: 2; }
-.ribbon::before { top: 7px; } .ribbon::after { bottom: 7px; }
-.track { display: flex; gap: 10px; width: max-content; padding: 20px 0; animation: roll 70s linear infinite; }
+.ribbon { position: fixed; z-index: 12; left: 0; right: 0; bottom: 0; height: 142px; background: rgba(8, 7, 6, .88); border-top: 1px solid var(--line); overflow: hidden; transition: opacity .5s, transform .6s var(--ease); }
+body[data-page="home"] .rail-foot { opacity: 0; pointer-events: none; }
+body.scrolled .ribbon { opacity: 0; transform: translateY(100%); pointer-events: none; }
+.ribbon::before, .ribbon::after { content: ""; position: absolute; left: 0; right: 0; height: 11px; background: repeating-linear-gradient(90deg, rgba(242, 235, 221, .26) 0 16px, transparent 16px 34px); z-index: 2; }
+.ribbon::before { top: 8px; } .ribbon::after { bottom: 8px; }
+.rl { position: absolute; z-index: 3; left: 0; top: 26px; background: var(--y); color: var(--k); font-size: 11px; letter-spacing: .2em; font-weight: 700; text-transform: uppercase; padding: 7px 18px 7px calc(var(--rail) - 120px + 40px); clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.track { display: flex; gap: 12px; width: max-content; padding: 28px 0; animation: roll 60s linear infinite; }
 .ribbon:hover .track { animation-play-state: paused; }
 @keyframes roll { to { transform: translateX(-50%); } }
-.fr { position: relative; flex: none; width: 120px; height: 52px; background-size: cover; background-position: center; border: 2px solid #000; filter: saturate(.85); transition: filter .3s, transform .3s var(--ease); }
-.fr:hover { filter: none; transform: translateY(-3px) scale(1.06); outline: 2px solid var(--y); }
-
+.fr { position: relative; flex: none; width: 190px; height: 86px; background-size: cover; background-position: center; border: 2px solid #000; filter: saturate(.85); transition: filter .3s, transform .3s var(--ease); }
+.fr:hover { filter: none; transform: translateY(-4px) scale(1.06); outline: 2px solid var(--y); }
+.fr small { position: absolute; left: 0; bottom: 0; background: rgba(0, 0, 0, .78); color: var(--y); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; padding: 3px 7px; }
+.blk { position: relative; padding: 100px 56px 100px calc(var(--rail) + 40px); background: rgba(11, 10, 9, .8); backdrop-filter: blur(14px) saturate(.8); }
+.blk.first { background: linear-gradient(180deg, rgba(11, 10, 9, 0) 0, rgba(11, 10, 9, .82) 200px); backdrop-filter: none; padding-top: 140px; }
+.blk h2 { font-size: clamp(44px, 5.4vw, 86px); line-height: .95; margin-bottom: 8px; } .blk h2 i { color: var(--y); font-style: normal; } .blk .lead { color: var(--dim); max-width: 520px; margin-bottom: 34px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+.card { display: block; transition: transform .4s var(--ease); } .card:hover { transform: translateY(-8px); }
+.card .im { aspect-ratio: 4 / 5; background-size: cover; background-position: center; border: 3px solid #000; position: relative; transition: outline-offset .3s; outline: 0 solid var(--y); } .card:hover .im { outline: 4px solid var(--y); outline-offset: 4px; }
+.card .im span { position: absolute; left: 0; top: 0; background: var(--y); color: var(--k); font-size: 10.5px; letter-spacing: .18em; font-weight: 700; text-transform: uppercase; padding: 5px 12px; }
+.card b { display: block; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1; margin-top: 12px; } .card small { color: var(--dim); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+.bio { display: grid; grid-template-columns: 340px 1fr; gap: 56px; align-items: center; }
+.bio .me { width: 340px; justify-self: start; animation: none; }
+.bio p { color: var(--dim); max-width: 560px; margin-bottom: 14px; font-size: 16px; }
+.foot { padding: 40px 56px 60px calc(var(--rail) + 40px); background: rgba(8, 7, 6, .92); display: flex; flex-wrap: wrap; gap: 14px 34px; align-items: center; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); } .foot a:hover, .foot button:hover { color: var(--y); } .foot .logo-link { margin-right: auto; }
+/* ---- the opening: the A's film strip scrolls the latest work ---- */
+#intro { position: fixed; inset: 0; z-index: 120; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .8s ease; }
+#intro.out { opacity: 0; pointer-events: none; }
+#intro svg { height: min(56vh, 500px); width: auto; overflow: visible; }
+#ibar { animation: barin 1s var(--ease) both; }
+@keyframes barin { from { opacity: 0; transform: translate(180px, -360px); } to { opacity: 1; transform: none; } }
+.il { text-align: center; animation: rise .9s var(--ease) .5s both; } .il b { display: block; font-size: clamp(36px, 5vw, 60px); letter-spacing: .14em; font-weight: 400; } .il span { display: block; margin-top: 6px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--y); min-height: 1.5em; }
+.skip { position: absolute; right: 26px; bottom: 22px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--faint); } .skip:hover { color: var(--y); }
+/* ---- tabs, studio ---- */
+.tabs { display: flex; gap: 8px; margin: -4px 0 26px; flex-wrap: wrap; } .tab { font-family: var(--display); font-size: 30px; letter-spacing: .02em; padding: 6px 22px 8px 0; margin-right: 16px; color: var(--faint); border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; } .tab:hover { color: var(--ink); } .tab[aria-pressed="true"] { color: var(--y); border-color: var(--y); }
+.drop { display: grid; place-items: center; text-align: center; gap: 6px; min-height: 150px; border: 3px dashed rgba(242, 183, 5, .7); background: rgba(242, 183, 5, .05); cursor: pointer; color: var(--dim); transition: background .25s; } .drop:hover { background: rgba(242, 183, 5, .12); } .drop b { font-size: 36px; color: var(--y); font-weight: 400; }
+.sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; } .sc { border: 1px solid var(--line); background: rgba(20, 18, 16, .7); } .sc .im { aspect-ratio: 4 / 3; background-size: cover; background-position: center; } .sc .bd { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; } .sc b { font-family: var(--display); font-weight: 400; font-size: 24px; line-height: 1; } .sc small { color: var(--dim); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.sw { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); } .sw i { width: 42px; height: 24px; border-radius: 14px; background: rgba(242, 235, 221, .2); position: relative; transition: background .25s; flex: none; } .sw i::after { content: ""; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink); transition: transform .3s var(--ease), background .25s; } .sw[aria-pressed="true"] { color: var(--y); } .sw[aria-pressed="true"] i { background: var(--y); } .sw[aria-pressed="true"] i::after { transform: translateX(18px); background: var(--k); }
 /* ---- page furniture ---- */
 .ph { margin-bottom: 30px; display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: flex-end; }
 .ph h1 { font-size: clamp(64px, 9vw, 150px); line-height: .92; }
@@ -114,7 +141,7 @@ select option { background: #1b1916; color: var(--ink); }
 .row .t { font-size: clamp(34px, 4.6vw, 70px); line-height: 1; }
 .row .m { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
 .row:hover { background: var(--y); color: var(--k); padding-left: 34px; } .row:hover .n, .row:hover .m { color: var(--k); }
-#float { position: fixed; z-index: 40; width: 380px; height: 250px; background-size: cover; background-position: center; border: 5px solid var(--y); pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.85) rotate(-3deg); transition: opacity .2s, transform .25s var(--ease); left: 0; top: 0; }
+#float { position: fixed; z-index: 40; width: 230px; height: 150px; background-size: cover; background-position: center; border: 4px solid var(--y); pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(.85) rotate(-3deg); transition: opacity .2s, transform .25s var(--ease); left: 0; top: 0; }
 #float.on { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(2deg); }
 /* ---- films: strip ---- */
 .strip { position: relative; display: flex; gap: 0; overflow-x: auto; padding: 56px 40px; margin-inline: -56px 0; background: #14120f; transform: rotate(-1.4deg); scrollbar-width: none; border-block: 1px solid var(--line); }
@@ -192,8 +219,9 @@ select option { background: #1b1916; color: var(--ink); }
   #mm { display: flex; position: fixed; inset: 0; z-index: 70; background: var(--y); color: var(--k); flex-direction: column; justify-content: center; padding: 80px max(24px, env(safe-area-inset-left, 0px)); gap: 2px; transform: translateY(-100%); transition: transform .6s cubic-bezier(.7, 0, .2, 1); }
   body.menu #mm { transform: none; } #mm a { font-family: var(--display); font-size: clamp(46px, 13vw, 84px); line-height: 1.06; } #mm .x { position: absolute; right: 20px; top: 14px; font-size: 38px; }
   #view { padding: 84px max(16px, env(safe-area-inset-right, 0px)) 110px max(16px, env(safe-area-inset-left, 0px)); }
-  .hero { left: max(16px, env(safe-area-inset-left, 0px)); right: 16px; bottom: 130px; max-width: none; } .hero h1 { font-size: 24vw; } .slab span { font-size: 11vw; } .hero .sub { font-size: 15px; }
-  .slate { display: none; } .ribbon { height: 78px; } .fr { height: 42px; width: 96px; }
+  .hero { left: max(16px, env(safe-area-inset-left, 0px)); right: 16px; bottom: 150px; max-width: none; } .hero h1 { font-size: 20vw; } .slab span { font-size: 7vw; }
+  .slate { display: none; } .ribbon { height: 112px; } .fr { height: 64px; width: 132px; } .rl { padding-left: 16px; top: 22px; }
+  .blk, .foot { padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); padding-block: 70px; } .cards { grid-template-columns: repeat(2, 1fr); } .bio { grid-template-columns: 1fr; gap: 28px; } .bio .me { width: 240px; } #intro svg { height: 46vh; }
   .row { grid-template-columns: 40px 1fr 70px; min-height: 76px; } .row .m:nth-child(3), .row .m:nth-child(5) { display: none; }
   .strip { margin-inline: -16px 0; padding-inline: 20px; } .frame { width: 220px; } .frame .im { height: 290px; }
   .fd, .feat, .hello, .contact { grid-template-columns: 1fr; } .me { justify-self: start; width: 260px; } .post { grid-template-columns: 1fr; gap: 6px; } .post .tg { text-align: left; }
@@ -212,7 +240,7 @@ select option { background: #1b1916; color: var(--ink); }
 <header id="rail">
   <a class="logo-link" href="#home" aria-label="Astris home"><svg class="logo" viewBox="0 0 1900 1600" fill="currentColor" fill-rule="evenodd"><path d="M0 1600 L600 1600 L1000 800 L700 200 Z M744.166 375.555 L750.555 362.778 L718.611 298.89 L693.056 350 Z M643.056 450 L694.166 475.555 L719.721 424.445 L668.611 398.89 Z M593.056 550 L644.166 575.555 L669.721 524.445 L618.611 498.89 Z M543.056 650 L594.166 675.555 L619.721 624.445 L568.611 598.89 Z M493.056 750 L544.166 775.555 L569.721 724.445 L518.611 698.89 Z M443.056 850 L494.166 875.555 L519.721 824.445 L468.611 798.89 Z M393.056 950 L444.166 975.555 L469.721 924.445 L418.611 898.89 Z M343.056 1050 L394.166 1075.555 L419.721 1024.445 L368.611 998.89 Z M293.056 1150 L344.166 1175.555 L369.721 1124.445 L318.611 1098.89 Z M243.056 1250 L294.166 1275.555 L319.721 1224.445 L268.611 1198.89 Z M193.056 1350 L244.166 1375.555 L269.721 1324.445 L218.611 1298.89 Z M143.056 1450 L194.166 1475.555 L219.721 1424.445 L168.611 1398.89 Z M169.721 1524.445 L118.611 1498.89 L93.056 1550 L156.944 1550 Z M944.166 775.555 L950.555 762.778 L918.611 698.89 L893.056 750 Z M843.056 850 L894.166 875.555 L919.721 824.445 L868.611 798.89 Z M793.056 950 L844.166 975.555 L869.721 924.445 L818.611 898.89 Z M743.056 1050 L794.166 1075.555 L819.721 1024.445 L768.611 998.89 Z M693.056 1150 L744.166 1175.555 L769.721 1124.445 L718.611 1098.89 Z M643.056 1250 L694.166 1275.555 L719.721 1224.445 L668.611 1198.89 Z M593.056 1350 L644.166 1375.555 L669.721 1324.445 L618.611 1298.89 Z M543.056 1450 L594.166 1475.555 L619.721 1424.445 L568.611 1398.89 Z M569.721 1524.445 L518.611 1498.89 L493.056 1550 L556.944 1550 Z M700 0 L1100 0 L1900 1600 L1500 1600 Z"/></svg><b>ASTRIS</b></a>
   <nav id="nav" aria-label="Main"></nav>
-  <div class="rail-foot">Film &amp; photography<br>[YOUR NAME]</div>
+  <div class="rail-foot">Film &amp; photography<br>[YOUR NAME]<br><a href="#studio" style="color:var(--y)">Studio preview</a></div>
   <button id="burger" aria-label="Open menu"><i></i><i></i></button>
 </header>
 <div id="mm"><button class="x" aria-label="Close menu">&#10005;</button></div>
@@ -252,6 +280,16 @@ select option { background: #1b1916; color: var(--ink); }
     ["blue", "Blue orbit", "Macro", "Oil and water", "2025-09-02", 1], ["dew", "Pink dew", "Macro", "Dew", "2025-08-15", 1], ["rain", "Rainbow dew", "Macro", "Dew", "2025-08-01", 0], ["magenta", "Magenta edge", "Macro", "Light and glass", "2025-07-12", 1],
     ["cream", "Cream and magenta", "Macro", "Light and glass", "2025-07-01", 0], ["stone", "Violet stone", "Macro", "Light and glass", "2025-06-10", 1]
   ].map(function (p, i) { return { id: i, k: p[0], title: p[1], coll: p[2], project: p[3], date: p[4], dl: !!p[5] }; });
+  var FEAT = { films: ["two-face", "charlie", "the-little-things"], photos: ["planet", "house", "bands", "cyclist", "lamp", "oil1"] };
+  FILMS.forEach(function (f) { f.feat = FEAT.films.indexOf(f.id) > -1; }); PHOTOS.forEach(function (p) { p.feat = FEAT.photos.indexOf(p.k) > -1; });
+  var bgu = function (u) { return "background-image:url('" + u + "')"; };
+  /* what shows on the intro, the homepage reel and "latest": everything switched on as featured in the Studio */
+  function featured() {
+    var l = [];
+    FILMS.forEach(function (f) { if (f.feat) l.push({ type: "Film", title: f.title, u: IMG(f.stills[0]), d: f.date, href: "#film-" + f.id }); });
+    PHOTOS.forEach(function (p) { if (p.feat) l.push({ type: "Photo", title: p.title, u: p.src || IMG(p.k), d: p.date, href: "#photography" }); });
+    return l.sort(function (a, b) { return b.d.localeCompare(a.d); });
+  }
   var STAGES = ["Idea", "Writing", "Shooting", "Editing", "Finishing"];
   var WIPS = [
     { title: "Oceans", kind: "Film", stage: 3, p: .6, still: "planet", up: ["2026-02-02", "[A SHORT UPDATE: WHAT HAPPENED THIS WEEK]"] },
@@ -264,7 +302,7 @@ select option { background: #1b1916; color: var(--ink); }
     { d: "2026-01-04", t: "[NEWS HEADLINE THREE]", tag: "Behind the scenes", k: "truck" }, { d: "2025-12-15", t: "[NEWS HEADLINE FOUR]", tag: "Studio", k: "blue" },
     { d: "2025-11-20", t: "[NEWS HEADLINE FIVE]", tag: "Films", k: "cyclist" }, { d: "2025-10-30", t: "[NEWS HEADLINE SIX]", tag: "Photography", k: "oil1" }
   ];
-  var NAV = [["home", "Home"], ["films", "Films"], ["photography", "Photography"], ["progress", "Work in progress"], ["news", "News"], ["hello", "Say hello"]];
+  var NAV = [["home", "Home"], ["films", "Films"], ["photography", "Photography"], ["news", "News"], ["hello", "Say hello"]];
   var SAMPLE = '<p class="note">Sample details. Film titles come from your films.txt. Dates, types, project names and anything in [brackets] are examples to show how the page works. Photo titles are placeholders.</p>';
 
   /* ---------- menu ---------- */
@@ -282,13 +320,14 @@ select option { background: #1b1916; color: var(--ink); }
   rv.addEventListener("loadeddata", function () { reel.classList.add("has-video"); var p = rv.play(); if (p && p.catch) p.catch(function () {}); });
   rv.addEventListener("error", function () { reel.classList.remove("has-video"); });
   var t0 = Date.now();
+  var homeScroll = function () { document.body.classList.toggle('scrolled', this.scrollTop > 120); };
   function tc() { var el = $("#tc"); if (!el) return; var s = rv.readyState > 1 && !rv.paused ? rv.currentTime : (Date.now() - t0) / 1000; var f = Math.floor((s % 1) * 24), x = Math.floor(s); el.textContent = [Math.floor(x / 3600), Math.floor(x / 60) % 60, x % 60].map(pad).join(":") + ":" + pad(f); }
   setInterval(tc, 41);
 
   /* ---------- toast, float preview ---------- */
   var tt; function toast(m) { var t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(function () { t.classList.remove("on"); }, 2200); }
   var fl = $("#float");
-  document.addEventListener("mousemove", function (e) { fl.style.left = e.clientX + 230 + "px"; fl.style.top = e.clientY + "px"; });
+  document.addEventListener("mousemove", function (e) { fl.style.left = e.clientX + 150 + "px"; fl.style.top = e.clientY + "px"; });
   function bindRows() {
     $$(".row").forEach(function (r) {
       r.addEventListener("mouseenter", function () { fl.style.backgroundImage = "url('" + IMG(r.dataset.k) + "')"; fl.classList.add("on"); });
@@ -304,21 +343,26 @@ select option { background: #1b1916; color: var(--ink); }
   /* ---------- pages ---------- */
   var P = {};
   P.home = function () {
-    var fr = FILMS.concat(FILMS).concat(FILMS).concat(FILMS).map(function (f, i) { return '<a class="fr" href="#film-' + f.id + '" style="' + bg(f.stills[i % 6]) + '" aria-label="' + f.title + '"></a>'; });
-    var half = fr.slice(0, fr.length / 2).join("");
-    $("#view").innerHTML = '<div class="home">' +
-      '<div class="hero"><div class="eyebrow cap rise">Film &amp; photography &nbsp;&middot;&nbsp; [YOUR NAME]</div>' +
-      '<h1 class="a rise" style="--d:90ms">ASTRIS</h1>' +
-      '<div class="slab a rise" style="--d:200ms"><span>SHOWREEL</span></div>' +
-      '<p class="sub rise" style="--d:320ms">Stories and stills, made by hand. The reel is playing behind you: pick a page from the menu, or jump straight in.</p>' +
-      '<div class="go rise" style="--d:420ms"><a class="btn y" href="#films">Watch the films &rarr;</a><a class="btn o" href="#photography">See the photos</a></div></div>' +
-      '<aside class="slate rise" style="--d:520ms"><div class="tc"><i class="rec"></i><span id="tc">00:00:00:00</span></div>Showreel &nbsp;&middot;&nbsp; on loop<small>Silent. Frame 1 of &infin;</small><small>Tap a frame below to open a film</small></aside>' +
-      '<div class="ribbon rise" style="--d:300ms"><div class="track">' + half + half + "</div></div></div>";
+    var F = featured(), half = F.concat(F).map(function (f) { return '<a class="fr" href="' + f.href + '" style="' + bgu(f.u) + '" aria-label="' + f.title + '"><small>' + f.type + "</small></a>"; }).join("");
+    var cards = F.slice(0, 4).map(function (f) { return '<a class="card rise" href="' + f.href + '"><div class="im" style="' + bgu(f.u) + '"><span>' + f.type + "</span></div><b>" + f.title.toUpperCase() + "</b><small>" + fmtDate(f.d) + "</small></a>"; }).join("");
+    var nw = NEWS.slice(0, 3).map(function (n) { return '<a class="post" href="#news"><time>' + fmtDate(n.d) + '</time><h3 class="a">' + n.t + '</h3><span class="tg">' + n.tag + "</span></a>"; }).join("");
+    $("#view").innerHTML = '<section class="hs"><div class="hero"><div class="eyebrow cap rise">Film &amp; photography &nbsp;&middot;&nbsp; [YOUR NAME]</div>' +
+      '<h1 class="a rise" style="--d:90ms">ASTRIS</h1><div class="slab a rise" style="--d:200ms"><span>SHOWREEL</span></div>' +
+      '<div class="go rise" style="--d:330ms"><a class="btn y" href="#films">Watch the films &rarr;</a><span class="cue">Scroll</span></div></div>' +
+      '<aside class="slate rise" style="--d:450ms"><div class="tc"><i class="rec"></i><span id="tc">00:00:00:00</span></div>Showreel &middot; on loop</aside></section>' +
+      '<div class="ribbon"><span class="rl">Latest work</span><div class="track">' + half + half + "</div></div>" +
+      '<section class="blk first"><h2 class="a">LATEST<i>.</i></h2><p class="lead">The newest films and photos.</p><div class="cards">' + cards + '</div></section>' +
+      '<section class="blk"><div class="bio"><div class="me" role="img" aria-label="Silhouette of a person holding a camera"></div><div><h2 class="a">HELLO<i>.</i></h2><p>[A SHORT BIO: WHO YOU ARE, WHAT YOU MAKE AND WHY. TWO OR THREE FRIENDLY SENTENCES.]</p><p>[ONE MORE LINE: WHERE YOU ARE BASED, OR WHAT YOU ARE WORKING ON NOW.]</p><a class="btn y" href="#hello">Say hello &rarr;</a></div></div></section>' +
+      '<section class="blk"><h2 class="a">NEWS<i>.</i></h2><p class="lead">What the studio is up to.</p>' + nw + SAMPLE + "</section>" +
+      '<footer class="foot"><a class="logo-link" href="#home"><svg class="logo" viewBox="0 0 1900 1600" fill="currentColor" fill-rule="evenodd"><path d="M0 1600 L600 1600 L1000 800 L700 200 Z M744.166 375.555 L750.555 362.778 L718.611 298.89 L693.056 350 Z M643.056 450 L694.166 475.555 L719.721 424.445 L668.611 398.89 Z M593.056 550 L644.166 575.555 L669.721 524.445 L618.611 498.89 Z M543.056 650 L594.166 675.555 L619.721 624.445 L568.611 598.89 Z M493.056 750 L544.166 775.555 L569.721 724.445 L518.611 698.89 Z M443.056 850 L494.166 875.555 L519.721 824.445 L468.611 798.89 Z M393.056 950 L444.166 975.555 L469.721 924.445 L418.611 898.89 Z M343.056 1050 L394.166 1075.555 L419.721 1024.445 L368.611 998.89 Z M293.056 1150 L344.166 1175.555 L369.721 1124.445 L318.611 1098.89 Z M243.056 1250 L294.166 1275.555 L319.721 1224.445 L268.611 1198.89 Z M193.056 1350 L244.166 1375.555 L269.721 1324.445 L218.611 1298.89 Z M143.056 1450 L194.166 1475.555 L219.721 1424.445 L168.611 1398.89 Z M169.721 1524.445 L118.611 1498.89 L93.056 1550 L156.944 1550 Z M944.166 775.555 L950.555 762.778 L918.611 698.89 L893.056 750 Z M843.056 850 L894.166 875.555 L919.721 824.445 L868.611 798.89 Z M793.056 950 L844.166 975.555 L869.721 924.445 L818.611 898.89 Z M743.056 1050 L794.166 1075.555 L819.721 1024.445 L768.611 998.89 Z M693.056 1150 L744.166 1175.555 L769.721 1124.445 L718.611 1098.89 Z M643.056 1250 L694.166 1275.555 L719.721 1224.445 L668.611 1198.89 Z M593.056 1350 L644.166 1375.555 L669.721 1324.445 L618.611 1298.89 Z M543.056 1450 L594.166 1475.555 L619.721 1424.445 L568.611 1398.89 Z M569.721 1524.445 L518.611 1498.89 L493.056 1550 L556.944 1550 Z M700 0 L1100 0 L1900 1600 L1500 1600 Z"/></svg><b>ASTRIS</b></a><a href="#films">Films</a><a href="#photography">Photography</a><a href="#news">News</a><a href="#hello">Say hello</a><a href="#studio">Studio preview</a><button id="replay0">Replay intro</button></footer>';
+    $("#replay0").onclick = function () { intro(true); };
+    $("#view").onscroll = homeScroll; document.body.classList.remove("scrolled");
     tc();
   };
   var fs = { sort: "new", type: "All", view: "List" };
+  var tabsHtml = function (cur) { return '<div class="tabs rise" style="--d:60ms"><a class="tab" href="#films" aria-pressed="' + (cur === "Finished") + '">Finished films</a><a class="tab" href="#progress" aria-pressed="' + (cur === "In progress") + '">In progress</a></div>'; };
   P.films = function () {
-    $("#view").innerHTML = head("FILMS", ".", "Short films, documentaries and experiments. Sort them, filter them, or flip the list into a film strip.") +
+    $("#view").innerHTML = head("FILMS", ".", "Short films, documentaries and experiments. Sort them, filter them, or flip the list into a film strip.") + tabsHtml("Finished") +
       '<div class="bar rise" style="--d:100ms"><div class="grp"><label for="fsort">Sort</label>' + select("fsort", [["new", "Newest first"], ["old", "Oldest first"], ["az", "A to Z"], ["short", "Shortest first"], ["long", "Longest first"]], fs.sort) + "</div>" +
       '<div class="grp"><span class="lab">Type</span>' + chips("type", ["All", "Short", "Documentary", "Experimental", "Coming soon"], fs.type) + "</div>" +
       '<div class="grp"><span class="lab">View</span>' + chips("view", ["List", "Strip"], fs.view) + '</div><span class="count" id="fcount"></span></div><div id="fout"></div>' + SAMPLE;
@@ -389,7 +433,7 @@ select option { background: #1b1916; color: var(--ink); }
 
   var ws = { kind: "All", sort: "far" };
   P.progress = function () {
-    $("#view").innerHTML = head("IN PROGRESS", ".", "What is being made right now, and how far along it is. Updated as things move.") +
+    $("#view").innerHTML = head("FILMS", ".", "What is being made right now, and how far along it is. Updated as things move.") + tabsHtml("In progress") +
       '<div class="bar rise" style="--d:100ms"><div class="grp"><span class="lab">Show</span>' + chips("kind", ["All", "Film", "Photography"], ws.kind) + '</div><div class="grp"><label for="wsort">Sort</label>' + select("wsort", [["far", "Furthest along"], ["new", "Latest update"], ["az", "A to Z"]], ws.sort) + '</div><span class="count" id="wcount"></span></div><div class="wips" id="wips"></div>' + SAMPLE;
     $("#wsort").onchange = function () { ws.sort = this.value; wips(); }; bindChips($("#view"), ws, wips); wips();
   };
@@ -422,6 +466,48 @@ select option { background: #1b1916; color: var(--ink); }
     $("#cp").onclick = function () { var t = $("#em").textContent, ok = function () { toast("Email copied"); }; if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { sel(); toast("Press Ctrl+C to copy"); }); else { sel(); toast("Press Ctrl+C to copy"); } function sel() { var r = document.createRange(); r.selectNodeContents($("#em")); var s = getSelection(); s.removeAllRanges(); s.addRange(r); } };
   };
 
+  P.studio = function () {
+    var up = 0;
+    $("#view").innerHTML = head("STUDIO", ".", "A preview of the back end. Upload something and choose whether it is featured on the opening intro, the homepage reel and the latest list.") +
+      '<div class="rise" style="--d:80ms"><label class="drop" for="upf"><b class="a">DROP A PHOTO HERE</b>or click to choose a file</label><input id="upf" type="file" accept="image/*" hidden></div>' +
+      '<div class="bar rise" style="--d:140ms;margin-top:26px"><span class="lab">Featured items: <b id="featn" style="color:var(--y)"></b></span><button class="btn o" id="replay">Replay the intro</button></div><div class="sgrid" id="sgrid"></div>' + SAMPLE;
+    function grid() {
+      var all = FILMS.map(function (f) { return { o: f, t: "Film", u: IMG(f.stills[0]), n: f.title }; }).concat(PHOTOS.map(function (p) { return { o: p, t: "Photo", u: p.src || IMG(p.k), n: p.title }; }));
+      all.sort(function (a, b) { return b.o.date.localeCompare(a.o.date); });
+      $("#featn").textContent = all.filter(function (x) { return x.o.feat; }).length;
+      $("#sgrid").innerHTML = all.map(function (x, i) { return '<div class="sc"><div class="im" style="' + bgu(x.u) + '"></div><div class="bd"><div><b>' + x.n.toUpperCase() + "</b><br><small>" + x.t + " &middot; " + fmtDate(x.o.date) + '</small></div><button class="sw" data-i="' + i + '" aria-pressed="' + !!x.o.feat + '"><i></i>Feature on intro</button></div></div>'; }).join("");
+      $$(".sw", $("#sgrid")).forEach(function (b) { b.onclick = function () { var o = all[+b.dataset.i].o; o.feat = !o.feat; grid(); toast(o.feat ? "Featured. It will scroll through the A." : "Removed from the intro"); }; });
+    }
+    grid();
+    $("#replay").onclick = function () { intro(true); };
+    $("#upf").onchange = function () { var f = this.files && this.files[0]; if (!f) return; PHOTOS.unshift({ id: 900 + up++, k: "upload", src: URL.createObjectURL(f), title: f.name.replace(/\.[^.]+$/, "").slice(0, 28) || "New upload", coll: "Black & white", project: "New", date: "2026-03-01", dl: false, feat: true }); grid(); toast("Uploaded. Featured by default: switch it off if you like."); };
+  };
+
+  /* ---------- the opening: the strip of the A scrolls the latest work, then the site arrives ---------- */
+  function intro(force) {
+    var seen = false; try { seen = sessionStorage.getItem("astris-intro") === "1"; } catch (e) {}
+    if ((seen && !force) || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    try { sessionStorage.setItem("astris-intro", "1"); } catch (e) {}
+    var old = $("#intro"); if (old) old.remove();
+    var F = featured(); if (!F.length) return; while (F.length < 7) F = F.concat(F);
+    F = F.slice(0, 10);
+    var FH = 380, STEP = 408, n = F.length;
+    var ov = document.createElement("div"); ov.id = "intro";
+    ov.innerHTML = '<svg viewBox="0 0 1900 1600" role="img" aria-label="Astris"><defs><clipPath id="icl"><path clip-rule="evenodd" d="M0 1600 L600 1600 L1000 800 L700 200 Z M744.166 375.555 L750.555 362.778 L718.611 298.89 L693.056 350 Z M643.056 450 L694.166 475.555 L719.721 424.445 L668.611 398.89 Z M593.056 550 L644.166 575.555 L669.721 524.445 L618.611 498.89 Z M543.056 650 L594.166 675.555 L619.721 624.445 L568.611 598.89 Z M493.056 750 L544.166 775.555 L569.721 724.445 L518.611 698.89 Z M443.056 850 L494.166 875.555 L519.721 824.445 L468.611 798.89 Z M393.056 950 L444.166 975.555 L469.721 924.445 L418.611 898.89 Z M343.056 1050 L394.166 1075.555 L419.721 1024.445 L368.611 998.89 Z M293.056 1150 L344.166 1175.555 L369.721 1124.445 L318.611 1098.89 Z M243.056 1250 L294.166 1275.555 L319.721 1224.445 L268.611 1198.89 Z M193.056 1350 L244.166 1375.555 L269.721 1324.445 L218.611 1298.89 Z M143.056 1450 L194.166 1475.555 L219.721 1424.445 L168.611 1398.89 Z M169.721 1524.445 L118.611 1498.89 L93.056 1550 L156.944 1550 Z M944.166 775.555 L950.555 762.778 L918.611 698.89 L893.056 750 Z M843.056 850 L894.166 875.555 L919.721 824.445 L868.611 798.89 Z M793.056 950 L844.166 975.555 L869.721 924.445 L818.611 898.89 Z M743.056 1050 L794.166 1075.555 L819.721 1024.445 L768.611 998.89 Z M693.056 1150 L744.166 1175.555 L769.721 1124.445 L718.611 1098.89 Z M643.056 1250 L694.166 1275.555 L719.721 1224.445 L668.611 1198.89 Z M593.056 1350 L644.166 1375.555 L669.721 1324.445 L618.611 1298.89 Z M543.056 1450 L594.166 1475.555 L619.721 1424.445 L568.611 1398.89 Z M569.721 1524.445 L518.611 1498.89 L493.056 1550 L556.944 1550 Z"/></clipPath></defs>' +
+      '<g clip-path="url(#icl)"><rect x="-300" y="-300" width="2500" height="2300" fill="#1b1916"/><g id="icol">' + F.map(function (f, i) { return '<image href="' + f.u + '" x="-330" y="' + (i * STEP - 190) + '" width="660" height="' + FH + '" preserveAspectRatio="xMidYMid slice"/>'; }).join("") + '</g></g>' +
+      '<path id="ibar" fill="#f2b705" fill-rule="evenodd" d="M700 0 L1100 0 L1900 1600 L1500 1600 Z"/></svg><div class="il"><b class="a">ASTRIS</b><span id="ilt"></span></div><button class="skip">Skip</button>';
+    document.body.appendChild(ov);
+    var col = $("#icol", ov), lab = $("#ilt", ov), t0 = performance.now(), DUR = 3600, travel = (n - 3) * STEP, done = false;
+    function exit() { if (done) return; done = true; ov.classList.add("out"); setTimeout(function () { ov.remove(); }, 900); }
+    ov.onclick = exit; document.addEventListener("keydown", function k(e) { if (e.key === "Escape") { exit(); document.removeEventListener("keydown", k); } });
+    (function tick(now) {
+      if (done) return; var p = Math.min(1, Math.max(0, (now - t0 - 350) / DUR)), e = 1 - Math.pow(1 - p, 2), Y = 520 - e * travel;
+      col.setAttribute("transform", "translate(500 1200) rotate(26.565) translate(0 " + Y.toFixed(1) + ")");
+      var i = Math.max(0, Math.min(n - 1, Math.round((-150 - Y) / STEP))); if (F[i]) lab.textContent = F[i].type + "  \u00b7  " + F[i].title;
+      if (now - t0 > DUR + 700) { exit(); return; } requestAnimationFrame(tick);
+    })(t0);
+  }
+
   /* ---------- routing: plain #names; a yellow strip wipes across between pages ---------- */
   function route() { return (location.hash || "#home").slice(1); }
   var first = true, last = "";
@@ -430,12 +516,14 @@ select option { background: #1b1916; color: var(--ink); }
     $("#lb").classList.remove("on"); $("#pl").classList.remove("on"); fl.classList.remove("on");
     var run = function () {
       document.body.dataset.page = page === "film" ? "films" : page; $("#view").scrollTop = 0;
-      $$("#nav a").forEach(function (a) { a.setAttribute("aria-current", a.dataset.r === (page === "film" ? "films" : page) ? "page" : "false"); });
+      var navKey = page === "film" || page === "progress" ? "films" : page;
+      $$("#nav a").forEach(function (a) { a.setAttribute("aria-current", a.dataset.r === navKey ? "page" : "false"); });
+      $("#view").onscroll = null; document.body.classList.remove("scrolled");
       if (page === "film") P.film(r.slice(5)); else P[page]();
     };
     if (first || key === last) { first = false; run(); } else { var t = $("#tape"); t.classList.remove("go"); void t.offsetWidth; t.classList.add("go"); setTimeout(run, 380); }
     last = key;
   }
-  window.addEventListener("hashchange", show); show();
+  window.addEventListener("hashchange", show); show(); if (route() === "home" || route() === "") intro(false);
 })();
 </script>
